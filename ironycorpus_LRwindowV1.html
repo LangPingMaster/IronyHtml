@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dcard Keyword Corpus Extractor</title>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      margin: 0;
+      background: #f6f8fb;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 20px 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h1, h2, h3 { margin-top: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="number"], input[type="file"], select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+    }
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 30px;
+    }
+    button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      margin-right: 10px;
+      margin-top: 12px;
+    }
+    button.secondary { background: #475569; }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .hint {
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .summary .item {
+      background: #eff6ff;
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .summary .label {
+      font-size: 12px;
+      color: #475569;
+    }
+    .summary .value {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: white;
+      table-layout: auto;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+      word-break: normal;
+      min-width: 90px;
+    }
+    td {
+      white-space: nowrap;
+      word-break: normal;
+    }
+    td.wrap-col {
+      white-space: normal;
+      word-break: break-word;
+      min-width: 220px;
+      line-height: 1.5;
+    }
+    .table-wrap {
+      overflow: auto;
+      max-height: 420px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+    .status {
+      margin-top: 10px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      color: #0f172a;
+    }
+    .danger { color: #b91c1c; }
+    .success { color: #166534; }
+    .download-group a {
+      display: inline-block;
+      margin-right: 10px;
+      margin-top: 10px;
+      background: #0f766e;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    code {
+      background: #eef2ff;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+     <h1>Dcard Lexical word Analyzer</h1>
+      <p class="hint">
+         讀取讀取語料庫 <code>dcard_posts_selected_corpus.csv</code> 檔案，輸入 keyword、分析語料=>顯示 collocation / construction 統計，並可下載 CSV 與 TXT 報告。
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>參數設定</h2>
+      <div class="grid">
+        <div>
+          <label for="csvFile">上傳 CSV 檔案</label>
+          <input type="file" id="csvFile" accept=".csv" />
+        </div>
+        <div>
+          <label for="keyword">Keyword</label>
+          <input type="text" id="keyword" value="不要太" />
+        </div>
+        <div>
+          <label for="maxWordLen">MAX_WORD_LEN</label>
+          <input type="number" id="maxWordLen" value="4" min="1" max="20" />
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="checkbox-row">
+          <input type="checkbox" id="chineseOnly" checked />
+          <label for="chineseOnly" style="margin:0; font-weight:600;">只保留中文 collocation</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="enableSpecial" checked />
+          <label for="enableSpecial" style="margin:0; font-weight:600;">啟用特殊構式偵測</label>
+        </div>
+      </div>
+
+      <button id="runBtn">開始分析</button>
+      <button id="loadDemoBtn" class="secondary">載入測試欄位格式說明</button>
+      <div id="status" class="status"></div>
+      <div id="downloads" class="download-group"></div>
+    </div>
+
+    <div class="card">
+      <h2>分析摘要</h2>
+      <div id="summary" class="summary"></div>
+    </div>
+
+    <div class="card">
+      <h2>Top Collocations</h2>
+      <div id="collocTable"></div>
+    </div>
+
+    <div class="card">
+      <h2>Construction Types</h2>
+      <div id="constructionTable"></div>
+    </div>
+
+    <div class="card">
+      <h2>Corpus Entries</h2>
+      <div id="corpusTable"></div>
+    </div>
+  </div>
+
+  <script>
+    const REQUIRED_COLS = [
+      "post_id", "forum", "title", "date", "content",
+      "gender", "likeCount", "commentCount"
+    ];
+
+    const LITERAL_HINTS = {
+      "不要太": ["晚", "早", "累", "胖", "瘦", "大聲", "晚睡", "擔心", "在意", "忙"],
+      "真是": [],
+      "也太": [],
+      "簡直": [],
+      "好": [],
+      "真": [],
+      "超": [],
+      "太": []
+    };
+
+    const EVALUATIVE_HINTS = [
+      "誇張", "離譜", "扯", "荒謬", "可悲", "可笑", "好笑", "白痴", "天才", "人才",
+      "厲害", "優秀", "好棒", "諷刺", "可憐", "智障", "經典", "噁心", "無言", "瞎",
+      "聰明", "專業", "棒", "會", "強", "神", "猛", "行", "優", "頂", "好看", "懂",
+      "可愛", "高明", "完美", "荒唐", "合理", "貼心", "感人"
+    ];
+
+    const TONE_PARTICLES = ["喔", "呢", "欸", "耶", "吧"];
+    const ZH_RE = /[\u4e00-\u9fff]/;
+
+    let lastOutputs = null;
+
+    document.getElementById("runBtn").addEventListener("click", runAnalysis);
+    document.getElementById("loadDemoBtn").addEventListener("click", () => {
+      setStatus(
+        "CSV 至少建議有這些欄位：\n" +
+        REQUIRED_COLS.join(", ") +
+        "\n\n如果缺欄位，系統會自動補空字串。",
+        "success"
+      );
+    });
+
+    function setStatus(msg, cls = "") {
+      const el = document.getElementById("status");
+      el.className = `status ${cls}`;
+      el.textContent = msg;
+    }
+
+    function cleanText(text) {
+      text = String(text ?? "");
+      text = text.replace(/http[s]?:\/\/\S+/g, " ");
+      text = text.replace(/<[^>]+>/g, " ");
+      text = text.replace(/\s+/g, " ").trim();
+      return text;
+    }
+
+    function splitSentences(text) {
+      text = cleanText(text);
+      if (!text) return [];
+      return text
+        .split(/[。！？!?；;\n\r]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+
+    function tokenCount(text) {
+      const tokens = String(text).match(/[\u4e00-\u9fff]|[A-Za-z0-9_]+/g);
+      return tokens ? tokens.length : 0;
+    }
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function buildGeneralPattern(keyword, maxLen) {
+      return new RegExp(`${escapeRegex(keyword)}\\s*([\\u4e00-\\u9fff]{1,${maxLen}})`);
+    }
+
+    function buildSpecialPatterns(maxLen) {
+      const particles = TONE_PARTICLES.map(escapeRegex).join("|");
+      return {
+        hao_adj_particle: new RegExp(`(好)\\s*([\\u4e00-\\u9fff]{1,${maxLen}})\\s*(${particles})`),
+        zhen_adj_particle: new RegExp(`(真)\\s*([\\u4e00-\\u9fff]{1,${maxLen}})\\s*(${particles})`),
+        chao_adj_de: new RegExp(`(超)\\s*([\\u4e00-\\u9fff]{1,${maxLen}})\\s*(的)`),
+        tai_adj_leba: new RegExp(`(太)\\s*([\\u4e00-\\u9fff]{1,${maxLen}})\\s*(了吧)`)
+      };
+    }
+
+    function extractGeneralCollocation(sentence, keyword, generalPattern) {
+      const m = sentence.match(generalPattern);
+      if (!m) return { collocation: keyword, afterWord: "", matched: false };
+      const afterWord = m[1];
+      return { collocation: keyword + afterWord, afterWord, matched: true };
+    }
+
+    function extractSpecialConstruction(sentence, specialPatterns) {
+      for (const [constructionType, pattern] of Object.entries(specialPatterns)) {
+        const m = sentence.match(pattern);
+        if (m) {
+          const prefix = m[1];
+          const core = m[2];
+          const finalParticle = m[3];
+          return {
+            collocation: `${prefix}${core}${finalParticle}`,
+            constructionType,
+            constructionCore: core,
+            finalParticle,
+            matched: true
+          };
+        }
+      }
+      return {
+        collocation: "",
+        constructionType: "",
+        constructionCore: "",
+        finalParticle: "",
+        matched: false
+      };
+    }
+
+    function extractContext(sentence, keyword, window = 8) {
+      const idx = sentence.indexOf(keyword);
+      if (idx === -1) return { leftContext: "", rightContext: "" };
+      return {
+        leftContext: sentence.slice(Math.max(0, idx - window), idx),
+        rightContext: sentence.slice(idx + keyword.length, idx + keyword.length + window)
+      };
+    }
+
+    function pragmaticGuess(keyword, afterWord, sentence, constructionType = "", finalParticle = "") {
+      if (constructionType) return "evaluative_candidate";
+
+      if (LITERAL_HINTS[keyword]) {
+        for (const w of LITERAL_HINTS[keyword]) {
+          if (afterWord.startsWith(w) || sentence.includes(w)) return "literal_candidate";
+        }
+      }
+
+      for (const w of EVALUATIVE_HINTS) {
+        if (afterWord.startsWith(w) || sentence.includes(w)) return "evaluative_candidate";
+      }
+
+      if (["真是", "也太", "簡直", "好", "真", "超", "太"].includes(keyword)) {
+        return "evaluative_candidate";
+      }
+
+      if (finalParticle) return "evaluative_candidate";
+      return "uncertain";
+    }
+
+    function sentenceMayMatch(sentence, keyword, enableSpecialConstructions) {
+      if (sentence.includes(keyword)) return true;
+      if (!enableSpecialConstructions) return false;
+      if (["好", "真", "超", "太"].includes(keyword) && sentence.includes(keyword)) return true;
+      return false;
+    }
+
+    function parseCSV(text) {
+      text = text.replace(/^\uFEFF/, "");
+      const rows = [];
+      let row = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = "";
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          row.push(current);
+          rows.push(row);
+          row = [];
+          current = "";
+        } else {
+          current += char;
+        }
+      }
+      row.push(current);
+      rows.push(row);
+
+      if (!rows.length) return [];
+      const header = rows[0].map(h => String(h).trim());
+      return rows.slice(1).filter(r => r.some(cell => String(cell).trim() !== "")).map(r => {
+        const obj = {};
+        header.forEach((h, idx) => { obj[h] = r[idx] ?? ""; });
+        REQUIRED_COLS.forEach(col => {
+          if (!(col in obj)) obj[col] = "";
+        });
+        for (const key of Object.keys(obj)) obj[key] = String(obj[key] ?? "");
+        return obj;
+      });
+    }
+
+    function valueCounts(arr, fieldName) {
+      const map = new Map();
+      for (const item of arr) {
+        const key = item ?? "";
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+      const out = Array.from(map.entries()).map(([value, freq]) => ({ [fieldName]: value, freq }));
+      out.sort((a, b) => b.freq - a.freq || String(a[fieldName]).localeCompare(String(b[fieldName]), 'zh-Hant'));
+      out.forEach((x, i) => x.rank = i + 1);
+      return out;
+    }
+
+    function toCSV(rows) {
+      if (!rows.length) return "";
+      const headers = Object.keys(rows[0]);
+      const esc = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      return [
+        headers.map(esc).join(','),
+        ...rows.map(row => headers.map(h => esc(row[h])).join(','))
+      ].join('\n');
+    }
+
+    function makeDownloadLink(filename, content, mime = 'text/plain;charset=utf-8') {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.textContent = `下載 ${filename}`;
+      return a;
+    }
+
+    function renderTable(containerId, rows, limit = 100, options = {}) {
+      const container = document.getElementById(containerId);
+      if (!rows || rows.length === 0) {
+        container.innerHTML = '<p class="hint">沒有資料</p>';
+        return;
+      }
+
+      const shown = rows.slice(0, limit);
+      const columnOrder = options.columnOrder || Object.keys(rows[0]);
+      const columnLabels = options.columnLabels || {};
+      const wrapColumns = new Set(options.wrapColumns || []);
+      const valueFormatters = options.valueFormatters || {};
+
+      let html = '<div class="table-wrap"><table><thead><tr>';
+      html += columnOrder.map(h => `<th>${escapeHtml(columnLabels[h] || h)}</th>`).join('');
+      html += '</tr></thead><tbody>';
+      html += shown.map(r => {
+        return '<tr>' + columnOrder.map(h => {
+          const raw = r[h] ?? '';
+          const formatted = valueFormatters[h] ? valueFormatters[h](raw, r) : raw;
+          const cls = wrapColumns.has(h) ? 'wrap-col' : '';
+          return `<td class="${cls}">${escapeHtml(formatted)}</td>`;
+        }).join('') + '</tr>';
+      }).join('');
+      html += '</tbody></table></div>';
+      if (rows.length > limit) {
+        html += `<p class="hint">目前顯示前 ${limit} 筆，共 ${rows.length} 筆。</p>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderSummary(summary) {
+      const el = document.getElementById('summary');
+      const items = [
+        ['Keyword', summary.keyword],
+        ['Total extracted sentences', summary.totalSentences],
+        ['Distinct collocations', summary.distinctCollocations],
+        ['Distinct construction types', summary.distinctConstructionTypes]
+      ];
+      el.innerHTML = items.map(([label, value]) => `
+        <div class="item">
+          <div class="label">${escapeHtml(label)}</div>
+          <div class="value">${escapeHtml(value)}</div>
+        </div>
+      `).join('');
+    }
+
+    async function runAnalysis() {
+      const fileInput = document.getElementById('csvFile');
+      const keyword = document.getElementById('keyword').value.trim();
+      const maxWordLen = parseInt(document.getElementById('maxWordLen').value, 10) || 4;
+      const chineseOnly = document.getElementById('chineseOnly').checked;
+      const enableSpecialConstructions = document.getElementById('enableSpecial').checked;
+      const downloadsEl = document.getElementById('downloads');
+      downloadsEl.innerHTML = '';
+
+      if (!fileInput.files.length) {
+        setStatus('請先上傳 CSV 檔案。', 'danger');
+        return;
+      }
+      if (!keyword) {
+        setStatus('請輸入 keyword。', 'danger');
+        return;
+      }
+
+      try {
+        setStatus('分析中...');
+        const file = fileInput.files[0];
+        const text = await file.text();
+        const df = parseCSV(text);
+
+        const generalPattern = buildGeneralPattern(keyword, maxWordLen);
+        const specialPatterns = buildSpecialPatterns(maxWordLen);
+        const prefixMap = {
+          hao_adj_particle: '好',
+          zhen_adj_particle: '真',
+          chao_adj_de: '超',
+          tai_adj_leba: '太'
+        };
+
+        const records = [];
+
+        for (const row of df) {
+          const title = cleanText(row.title || '');
+          const content = cleanText(row.content || '');
+          const combined = `${title}\n${content}`.trim();
+          if (!combined) continue;
+          if (!sentenceMayMatch(combined, keyword, enableSpecialConstructions)) continue;
+
+          let sentences = splitSentences(combined);
+          if (!sentences.length) sentences = [combined];
+
+          sentences.forEach((sent, idx) => {
+            if (!sentenceMayMatch(sent, keyword, enableSpecialConstructions)) return;
+
+            let collocation = '';
+            let afterWord = '';
+            let matched = false;
+            let constructionType = '';
+            let constructionCore = '';
+            let finalParticle = '';
+            let matchedSpecialConstruction = false;
+
+            if (enableSpecialConstructions) {
+              const special = extractSpecialConstruction(sent, specialPatterns);
+              if (special.matched) {
+                const neededPrefix = prefixMap[special.constructionType] || '';
+                if (keyword === neededPrefix) {
+                  collocation = special.collocation;
+                  afterWord = special.constructionCore;
+                  constructionType = special.constructionType;
+                  constructionCore = special.constructionCore;
+                  finalParticle = special.finalParticle;
+                  matched = true;
+                  matchedSpecialConstruction = true;
+                }
+              }
+            }
+
+            if (!matched) {
+              if (!sent.includes(keyword)) return;
+              const general = extractGeneralCollocation(sent, keyword, generalPattern);
+              collocation = general.collocation;
+              afterWord = general.afterWord;
+              matched = general.matched;
+            }
+
+            if (chineseOnly && afterWord) {
+              const re = new RegExp(`^[\\u4e00-\\u9fff]{1,${maxWordLen}}$`);
+              if (!re.test(afterWord)) return;
+            }
+
+            const contextAnchor = matchedSpecialConstruction ? (prefixMap[constructionType] || keyword) : keyword;
+            const { leftContext, rightContext } = extractContext(sent, contextAnchor);
+            const guess = pragmaticGuess(keyword, afterWord, sent, constructionType, finalParticle);
+
+            records.push({
+              post_id: row.post_id || '',
+              forum: row.forum || '',
+              title,
+              date: row.date || '',
+              gender: row.gender || '',
+              likeCount: row.likeCount || '',
+              commentCount: row.commentCount || '',
+              sentence_id_in_post: idx + 1,
+              sentence: sent,
+              keyword,
+              collocation,
+              word_after_keyword: afterWord,
+              matched_collocation: matched ? 1 : 0,
+              construction_type: constructionType,
+              construction_core: constructionCore,
+              final_particle: finalParticle,
+              matched_special_construction: matchedSpecialConstruction ? 1 : 0,
+              left_context: leftContext,
+              right_context: rightContext,
+              char_count_sentence: sent.length,
+              token_count_sentence: tokenCount(sent),
+              pragmatic_guess: guess
+            });
+          });
+        }
+
+        if (!records.length) {
+          renderSummary({
+            keyword,
+            totalSentences: 0,
+            distinctCollocations: 0,
+            distinctConstructionTypes: 0
+          });
+          renderTable('collocTable', []);
+          renderTable('constructionTable', []);
+          renderTable('corpusTable', []);
+          setStatus('No matched sentences found.', 'danger');
+          return;
+        }
+
+        let collocFreq = valueCounts(records.map(r => r.collocation), 'collocation');
+        let constructionFreq = valueCounts(
+          records.map(r => r.construction_type || 'general_keyword_pattern'),
+          'construction_type'
+        );
+
+        const collocMap = Object.fromEntries(collocFreq.map(r => [r.collocation, r]));
+        const constructionMap = Object.fromEntries(constructionFreq.map(r => [r.construction_type, r]));
+
+        const corpus = records.map(r => {
+          const normalizedConstructionType = r.construction_type || 'general_keyword_pattern';
+          return {
+            ...r,
+            construction_type: normalizedConstructionType,
+            collocation_freq: collocMap[r.collocation]?.freq ?? '',
+            collocation_rank: collocMap[r.collocation]?.rank ?? '',
+            construction_freq: constructionMap[normalizedConstructionType]?.freq ?? '',
+            construction_rank: constructionMap[normalizedConstructionType]?.rank ?? ''
+          };
+        }).sort((a, b) => {
+          return (b.collocation_freq - a.collocation_freq)
+            || String(a.collocation).localeCompare(String(b.collocation), 'zh-Hant')
+            || String(a.post_id).localeCompare(String(b.post_id), 'zh-Hant')
+            || (a.sentence_id_in_post - b.sentence_id_in_post);
+        });
+
+        collocFreq = [...collocFreq].sort((a, b) => b.freq - a.freq || String(a.collocation).localeCompare(String(b.collocation), 'zh-Hant'));
+        constructionFreq = [...constructionFreq].sort((a, b) => b.freq - a.freq || String(a.construction_type).localeCompare(String(b.construction_type), 'zh-Hant'));
+
+        renderSummary({
+          keyword,
+          totalSentences: corpus.length,
+          distinctCollocations: collocFreq.length,
+          distinctConstructionTypes: constructionFreq.length
+        });
+
+        renderTable('collocTable', collocFreq, 50, {
+          columnOrder: ['collocation', 'freq', 'rank'],
+          columnLabels: {
+            collocation: '搭配詞',
+            freq: '頻率',
+            rank: '排名'
+          }
+        });
+
+        renderTable('constructionTable', constructionFreq, 50, {
+          columnOrder: ['construction_type', 'freq', 'rank'],
+          columnLabels: {
+            construction_type: '構式類型',
+            freq: '頻率',
+            rank: '排名'
+          },
+          valueFormatters: {
+            construction_type: v => v === 'general_keyword_pattern' ? 'general_keyword_pattern（一般關鍵詞模式）' : v
+          }
+        });
+
+        renderTable('corpusTable', corpus, 200, {
+          columnOrder: [
+            'post_id', 'forum', 'title', 'date', 'sentence_id_in_post', 'sentence',
+            'keyword', 'collocation', 'word_after_keyword', 'construction_type',
+            'construction_core', 'final_particle', 'pragmatic_guess',
+            'left_context', 'right_context', 'likeCount', 'commentCount', 'gender',
+            'token_count_sentence', 'char_count_sentence', 'matched_collocation',
+            'matched_special_construction', 'collocation_freq', 'collocation_rank',
+            'construction_freq', 'construction_rank'
+          ],
+          columnLabels: {
+            post_id: '文章ID',
+            forum: '看板',
+            title: '標題',
+            date: '日期',
+            sentence_id_in_post: '句子序號',
+            sentence: '句子',
+            keyword: '關鍵詞',
+            collocation: '搭配詞',
+            word_after_keyword: '關鍵詞後詞',
+            construction_type: '構式類型',
+            construction_core: '構式核心',
+            final_particle: '句尾詞',
+            pragmatic_guess: '語用判斷',
+            left_context: '左側語境',
+            right_context: '右側語境',
+            likeCount: 'Like',
+            commentCount: '留言數',
+            gender: '性別',
+            token_count_sentence: 'Token數',
+            char_count_sentence: '字元數',
+            matched_collocation: '有無搭配詞',
+            matched_special_construction: '有無特殊構式',
+            collocation_freq: '搭配詞頻率',
+            collocation_rank: '搭配詞排名',
+            construction_freq: '構式頻率',
+            construction_rank: '構式排名'
+          },
+          wrapColumns: ['title', 'sentence', 'left_context', 'right_context'],
+          valueFormatters: {
+            construction_type: v => v === 'general_keyword_pattern' ? 'general_keyword_pattern（一般關鍵詞模式）' : v
+          }
+        });
+
+        const txtLines = [];
+        txtLines.push(`keyword: ${keyword}`);
+        txtLines.push(`input_file: ${file.name}`);
+        txtLines.push(`total_sentences: ${corpus.length}`);
+        txtLines.push(`distinct_collocations: ${collocFreq.length}`);
+        txtLines.push(`distinct_construction_types: ${constructionFreq.length}`);
+        txtLines.push(`max_word_len: ${maxWordLen}`);
+        txtLines.push(`chinese_only: ${chineseOnly}`);
+        txtLines.push(`enable_special_constructions: ${enableSpecialConstructions}`);
+        txtLines.push('');
+        txtLines.push('===== CONSTRUCTION TYPES =====');
+        constructionFreq.forEach(r => txtLines.push(`${r.rank}\t${r.construction_type}\t${r.freq}`));
+        txtLines.push('');
+        txtLines.push('===== TOP COLLOCATIONS =====');
+        collocFreq.forEach(r => txtLines.push(`${r.rank}\t${r.collocation}\t${r.freq}`));
+        txtLines.push('');
+        txtLines.push('===== CORPUS ENTRIES =====');
+        txtLines.push('');
+
+        corpus.forEach((r, i) => {
+          txtLines.push(`[${i + 1}]`);
+          Object.entries(r).forEach(([k, v]) => txtLines.push(`${k}: ${v}`));
+          txtLines.push('');
+        });
+
+        const corpusCsv = toCSV(corpus);
+        const collocCsv = toCSV(collocFreq);
+        const constructionCsv = toCSV(constructionFreq);
+        const txtReport = txtLines.join('\n');
+
+        downloadsEl.innerHTML = '';
+        downloadsEl.appendChild(makeDownloadLink(`${keyword}_corpus.csv`, '\uFEFF' + corpusCsv, 'text/csv;charset=utf-8'));
+        downloadsEl.appendChild(makeDownloadLink(`${keyword}_collocations.csv`, '\uFEFF' + collocCsv, 'text/csv;charset=utf-8'));
+        downloadsEl.appendChild(makeDownloadLink(`${keyword}_construction_stats.csv`, '\uFEFF' + constructionCsv, 'text/csv;charset=utf-8'));
+        downloadsEl.appendChild(makeDownloadLink(`${keyword}_corpus.txt`, txtReport, 'text/plain;charset=utf-8'));
+
+        lastOutputs = { corpus, collocFreq, constructionFreq, txtReport };
+
+        setStatus(
+          `Done.\nKeyword: ${keyword}\nTotal extracted sentences: ${corpus.length}\nDistinct collocations: ${collocFreq.length}\nDistinct construction types: ${constructionFreq.length}`,
+          'success'
+        );
+      } catch (err) {
+        console.error(err);
+        setStatus(`執行失敗：${err.message}`, 'danger');
+      }
+    }
+  </script>
+</body>
+</html>

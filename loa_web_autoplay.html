@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOA Web Autoplay</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #2563eb;
+      --primary-2: #1d4ed8;
+      --board-dark: #d79a45;
+      --board-light: #e6c083;
+      --accent: #f59e0b;
+      --danger: #dc2626;
+      --ok: #059669;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #f8fafc 40%, #fff7ed);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .top {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(229,231,235,.8);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      overflow: hidden;
+    }
+    .card h1, .card h2, .card h3, p { margin: 0; }
+    .head {
+      padding: 22px 22px 8px;
+    }
+    .head h1 { font-size: 30px; }
+    .sub { color: var(--muted); margin-top: 8px; line-height: 1.55; }
+    .body { padding: 18px 22px 22px; }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .field select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-size: 15px;
+    }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    button.primary { background: var(--primary); color: white; }
+    button.primary:hover { background: var(--primary-2); }
+    button.secondary { background: #f3f4f6; color: var(--text); }
+    button.secondary:hover { background: #e5e7eb; }
+    button.outline { background: white; color: var(--text); border: 1px solid var(--line); }
+    button.outline:hover { background: #f9fafb; }
+    .statusbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .badge.win { background: #dcfce7; color: #166534; }
+    .badge.draw { background: #fef3c7; color: #92400e; }
+    .progress {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, #2563eb);
+      transition: width .18s linear;
+    }
+    .board-panel {
+      display: flex;
+      justify-content: center;
+      padding: 4px 0 12px;
+    }
+    .board-shell {
+      background: #7c4a17;
+      border-radius: 28px;
+      padding: 18px;
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.1), 0 18px 38px rgba(0,0,0,.15);
+    }
+    .board {
+      display: grid;
+      grid-template-columns: 34px repeat(7, 58px);
+      grid-template-rows: 34px repeat(7, 58px);
+      gap: 6px;
+      align-items: center;
+      justify-items: center;
+    }
+    .axis {
+      font-weight: 800;
+      color: #fffbeb;
+      opacity: .95;
+      user-select: none;
+    }
+    .cell {
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      position: relative;
+      transition: transform .16s ease, box-shadow .16s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .cell.light { background: var(--board-light); }
+    .cell.dark { background: var(--board-dark); }
+    .cell.from { outline: 4px solid rgba(37,99,235,.7); }
+    .cell.to { outline: 4px solid rgba(234,179,8,.85); }
+    .piece {
+      position: absolute;
+      inset: 9px;
+      border-radius: 999px;
+      transition: transform .18s ease, opacity .18s ease;
+      box-shadow: 0 6px 12px rgba(0,0,0,.18);
+    }
+    .piece.black {
+      background: radial-gradient(circle at 30% 30%, #3f3f46, #09090b 68%);
+      border: 1px solid #18181b;
+    }
+    .piece.white {
+      background: radial-gradient(circle at 30% 30%, #ffffff, #e5e7eb 78%);
+      border: 1px solid #d1d5db;
+    }
+    .desc {
+      background: #f8fafc;
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: #334155;
+      line-height: 1.6;
+      min-height: 72px;
+    }
+    .grid-right { display: grid; gap: 20px; }
+    .download-list, .rule-list { display: grid; gap: 10px; }
+    .small { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .log-wrap {
+      max-height: 420px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      z-index: 1;
+    }
+    tr.active { background: #fffbeb; }
+    .footer-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 980px) {
+      .top { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .controls { grid-template-columns: 1fr; }
+      .board {
+        grid-template-columns: 28px repeat(7, 44px);
+        grid-template-rows: 28px repeat(7, 44px);
+        gap: 5px;
+      }
+      .cell {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+      }
+      .piece { inset: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <section class="card">
+        <div class="head">
+          <h1>LOA 網頁版自動對戰</h1>
+          <p class="sub">開局採用題目圖片的標準 7×7 初始棋盤：黑子在上排與下排、白子在左排與右排、四角留空。按下開始後，一次只跑 1 局，可選 heuristic 或 minimax 對戰，並可切換播放速度。</p>
+        </div>
+        <div class="body">
+          <div class="controls">
+            <div class="field">
+              <label for="blackAI">Black AI</label>
+              <select id="blackAI">
+                <option value="heuristic">heuristic</option>
+                <option value="minimax">minimax</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="whiteAI">White AI</label>
+              <select id="whiteAI">
+                <option value="heuristic">heuristic</option>
+                <option value="minimax">minimax</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="speedSelect">Speed</label>
+              <select id="speedSelect">
+                <option value="100">100ms / step</option>
+                <option value="200" selected>200ms / step</option>
+                <option value="400">400ms / step</option>
+                <option value="500">500ms / step</option>
+                <option value="1000">1000ms / step</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="primary" id="startBtn">開始 1 局</button>
+            <button class="secondary" id="pauseBtn">暫停 / 繼續</button>
+            <button class="outline" id="resetBtn">重設</button>
+          </div>
+
+          <div class="statusbar">
+            <span class="badge" id="modeBadge">black: heuristic / white: heuristic</span>
+            <span class="badge" id="stepBadge">目前步數：0 / 50</span>
+            <span class="badge" id="turnBadge">輪到：black</span>
+            <span class="badge" id="speedBadge">速度：200ms / step</span>
+            <span class="badge" id="resultBadge">結果：尚未開始</span>
+          </div>
+
+          <div class="progress"><div id="progressBar"></div></div>
+
+          <div class="board-panel">
+            <div class="board-shell">
+              <div class="board" id="board"></div>
+            </div>
+          </div>
+
+          <div class="desc" id="descBox">初始棋盤已載入，按下「開始 1 局」後開始自動對戰。</div>
+        </div>
+      </section>
+
+      <div class="grid-right">
+        <section class="card">
+          <div class="head"><h2>開局棋盤與規則重點</h2></div>
+          <div class="body">
+            <div class="two-col">
+              <div>
+                <p class="small">初始棋盤：</p>
+                <pre class="small" style="background:#f8fafc;padding:12px;border-radius:14px;border:1px solid var(--line);overflow:auto;"> . X X X X X .
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ . X X X X X .
+</pre>
+              </div>
+              <div>
+                <p class="small">規則摘要：</p>
+                <div class="rule-list small">
+                  <div>1. 黑子先下，雙方輪流移動。</div>
+                  <div>2. 可沿橫、直、斜線移動，步數等於該方向整條線上的棋子總數。</div>
+                  <div>3. 終點可為空格或敵方棋子；若為敵方棋子則吃掉。</div>
+                  <div>4. 可穿越己方棋子，但不可穿越敵方棋子。</div>
+                  <div>5. 全部己方棋子連成一塊即獲勝；若雙方同時連通，移動者獲勝。</div>
+                  <div>6. 無合法步可走者敗；總步數超過 50 則和局。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>下載結果檔案</h2></div>
+          <div class="body">
+            <div class="download-list">
+              <button class="outline" id="dlInit">下載 GameStatus_initial.txt</button>
+              <button class="outline" id="dlFinal">下載 GameStatus_final.txt</button>
+              <button class="outline" id="dlLog">下載 StepLog.txt</button>
+              <button class="outline" id="dlSummary">下載 ResultSummary.txt</button>
+            </div>
+            <div class="footer-note">
+              下載格式比照作業需求：Game Status 為 7 行棋盤文字加最後空白行；Step Log 每列使用 tab 分隔 step、color、from、to。
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>Step Log</h2></div>
+          <div class="body">
+            <div class="log-wrap">
+              <table>
+                <thead>
+                  <tr><th>Step</th><th>Color</th><th>From</th><th>To</th><th>AI</th></tr>
+                </thead>
+                <tbody id="logBody">
+                  <tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_SIZE = 7;
+    const EMPTY = '.';
+    const BLACK = 'X';
+    const WHITE = 'O';
+    let STEP_INTERVAL = 200;
+    const MAX_STEPS = 50;
+    const COLS = ['A','B','C','D','E','F','G'];
+    const DIRS = [
+      [-1,-1],[-1,0],[-1,1],
+      [0,-1],        [0,1],
+      [1,-1],[1,0],[1,1]
+    ];
+
+    const initialBoard = [
+      ['.','X','X','X','X','X','.'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['.','X','X','X','X','X','.']
+    ];
+
+    const state = {
+      board: cloneBoard(initialBoard),
+      logs: [],
+      snapshots: [],
+      currentIndex: 0,
+      timer: null,
+      playing: false,
+      winner: null,
+      blackMode: 'heuristic',
+      whiteMode: 'heuristic',
+      currentTurn: 'black',
+      finalReason: '尚未開始',
+      lastMove: null
+    };
+
+    const boardEl = document.getElementById('board');
+    const logBody = document.getElementById('logBody');
+    const progressBar = document.getElementById('progressBar');
+    const descBox = document.getElementById('descBox');
+    const modeBadge = document.getElementById('modeBadge');
+    const stepBadge = document.getElementById('stepBadge');
+    const turnBadge = document.getElementById('turnBadge');
+    const resultBadge = document.getElementById('resultBadge');
+    const speedBadge = document.getElementById('speedBadge');
+    const blackAI = document.getElementById('blackAI');
+    const whiteAI = document.getElementById('whiteAI');
+    const speedSelect = document.getElementById('speedSelect');
+
+    function cloneBoard(board) {
+      return board.map(row => row.slice());
+    }
+
+    function getSelectedSpeed() {
+      return parseInt(speedSelect.value, 10);
+    }
+
+    function updateSpeedBadge() {
+      speedBadge.textContent = `速度：${STEP_INTERVAL}ms / step`;
+    }
+
+    function resetState() {
+      stopPlayback();
+      STEP_INTERVAL = getSelectedSpeed();
+      state.board = cloneBoard(initialBoard);
+      state.logs = [];
+      state.snapshots = [{
+        board: cloneBoard(initialBoard),
+        label: 'Initial Board',
+        turn: 'black',
+        lastMove: null
+      }];
+      state.currentIndex = 0;
+      state.playing = false;
+      state.winner = null;
+      state.blackMode = blackAI.value;
+      state.whiteMode = whiteAI.value;
+      state.currentTurn = 'black';
+      state.finalReason = '尚未開始';
+      state.lastMove = null;
+      renderSnapshot();
+      renderLogs();
+      updateBadges();
+    }
+
+    function stopPlayback() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+      }
+      state.playing = false;
+    }
+
+    function startPlayback() {
+      stopPlayback();
+      state.playing = true;
+      state.timer = setInterval(() => {
+        if (state.currentIndex < state.snapshots.length - 1) {
+          state.currentIndex += 1;
+          renderSnapshot();
+          updateBadges();
+          renderLogs();
+        } else {
+          stopPlayback();
+          updateBadges();
+        }
+      }, STEP_INTERVAL);
+    }
+
+    function inBounds(r, c) {
+      return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE;
+    }
+
+    function colorToPiece(color) {
+      return color === 'black' ? BLACK : WHITE;
+    }
+
+    function opponent(color) {
+      return color === 'black' ? 'white' : 'black';
+    }
+
+    function countPiecesOnLine(board, r, c, dr, dc) {
+      let rr = r, cc = c;
+      while (inBounds(rr - dr, cc - dc)) {
+        rr -= dr;
+        cc -= dc;
+      }
+      let count = 0;
+      while (inBounds(rr, cc)) {
+        if (board[rr][cc] !== EMPTY) count++;
+        rr += dr;
+        cc += dc;
+      }
+      return count;
+    }
+
+    function legalMoveInDirection(board, sr, sc, dr, dc, piece) {
+      if (board[sr][sc] !== piece) return null;
+
+      const distance = countPiecesOnLine(board, sr, sc, dr, dc);
+      const tr = sr + dr * distance;
+      const tc = sc + dc * distance;
+      const enemy = piece === BLACK ? WHITE : BLACK;
+
+      if (!inBounds(tr, tc)) return null;
+      if (board[tr][tc] === piece) return null;
+
+      for (let step = 1; step < distance; step++) {
+        const rr = sr + dr * step;
+        const cc = sc + dc * step;
+        if (!inBounds(rr, cc)) return null;
+        if (board[rr][cc] === enemy) return null;
+      }
+
+      return { sr, sc, tr, tc };
+    }
+
+    function generateLegalMoves(board, color) {
+      const piece = colorToPiece(color);
+      const moves = [];
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] !== piece) continue;
+          for (const [dr, dc] of DIRS) {
+            const mv = legalMoveInDirection(board, r, c, dr, dc, piece);
+            if (mv) moves.push(mv);
+          }
+        }
+      }
+      return moves;
+    }
+
+    function applyMove(board, move) {
+      const next = cloneBoard(board);
+      next[move.tr][move.tc] = next[move.sr][move.sc];
+      next[move.sr][move.sc] = EMPTY;
+      return next;
+    }
+
+    function countPieces(board, piece) {
+      let n = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) n++;
+        }
+      }
+      return n;
+    }
+
+    function dfs(board, r, c, piece, vis) {
+      vis[r][c] = true;
+      let total = 1;
+
+      for (const [dr, dc] of DIRS) {
+        const nr = r + dr, nc = c + dc;
+        if (inBounds(nr, nc) && !vis[nr][nc] && board[nr][nc] === piece) {
+          total += dfs(board, nr, nc, piece, vis);
+        }
+      }
+      return total;
+    }
+
+    function isConnected(board, color) {
+      const piece = colorToPiece(color);
+      const total = countPieces(board, piece);
+
+      if (total === 0) return false;
+      if (total === 1) return true;
+
+      let sr = -1, sc = -1;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) {
+            sr = r;
+            sc = c;
+            break;
+          }
+        }
+        if (sr !== -1) break;
+      }
+
+      const vis = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
+      return dfs(board, sr, sc, piece, vis) === total;
+    }
+
+    function manhattanSpread(board, color) {
+      const piece = colorToPiece(color);
+      const pos = [];
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) pos.push([r, c]);
+        }
+      }
+
+      if (pos.length <= 1) return 0;
+
+      let sum = 0;
+      for (let i = 0; i < pos.length; i++) {
+        for (let j = i + 1; j < pos.length; j++) {
+          sum += Math.abs(pos[i][0] - pos[j][0]) + Math.abs(pos[i][1] - pos[j][1]);
+        }
+      }
+      return sum;
+    }
+
+    function centerScore(move) {
+      const cr = 3, cc = 3;
+      return 10 - (Math.abs(move.tr - cr) + Math.abs(move.tc - cc));
+    }
+
+    function evaluateBoard(board, color) {
+      const enemy = opponent(color);
+
+      if (isConnected(board, color) && isConnected(board, enemy)) return 100000;
+      if (isConnected(board, color)) return 100000;
+      if (isConnected(board, enemy)) return -100000;
+
+      const mySpread = manhattanSpread(board, color);
+      const opSpread = manhattanSpread(board, enemy);
+      const myMoves = generateLegalMoves(board, color).length;
+      const opMoves = generateLegalMoves(board, enemy).length;
+      const myCount = countPieces(board, colorToPiece(color));
+      const opCount = countPieces(board, colorToPiece(enemy));
+
+      return (opSpread - mySpread) * 4 + (myMoves - opMoves) * 7 + (myCount - opCount) * 80;
+    }
+
+    function evaluateMoveHeuristic(board, move, color) {
+      const enemy = opponent(color);
+      const next = applyMove(board, move);
+      let score = 0;
+
+      if (board[move.tr][move.tc] === colorToPiece(enemy)) score += 500;
+      if (isConnected(next, color) && isConnected(next, enemy)) score += 120000;
+      else if (isConnected(next, color)) score += 100000;
+      else if (isConnected(next, enemy)) score -= 100000;
+
+      score += (manhattanSpread(board, color) - manhattanSpread(next, color)) * 5;
+      score += centerScore(move) * 3;
+      score += (generateLegalMoves(next, color).length - generateLegalMoves(next, enemy).length) * 4;
+
+      return score;
+    }
+
+    function chooseHeuristicMove(board, color) {
+      const moves = generateLegalMoves(board, color);
+      if (!moves.length) return null;
+
+      let best = moves[0], bestScore = -Infinity;
+      for (const mv of moves) {
+        const score = evaluateMoveHeuristic(board, mv, color);
+        if (score > bestScore) {
+          bestScore = score;
+          best = mv;
+        }
+      }
+      return best;
+    }
+
+    function minimax(board, depth, maxPlayerColor, currentColor, alpha, beta) {
+      const enemy = opponent(currentColor);
+
+      if (depth === 0 || isConnected(board, currentColor) || isConnected(board, enemy)) {
+        return { score: evaluateBoard(board, maxPlayerColor), move: null };
+      }
+
+      const moves = generateLegalMoves(board, currentColor);
+      if (!moves.length) {
+        const score = currentColor === maxPlayerColor ? -99999 : 99999;
+        return { score, move: null };
+      }
+
+      const maximizing = currentColor === maxPlayerColor;
+      let bestMove = moves[0];
+
+      if (maximizing) {
+        let bestScore = -Infinity;
+        for (const mv of moves) {
+          const next = applyMove(board, mv);
+          const result = minimax(next, depth - 1, maxPlayerColor, opponent(currentColor), alpha, beta);
+          const score = result.score;
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = mv;
+          }
+          alpha = Math.max(alpha, bestScore);
+          if (beta <= alpha) break;
+        }
+        return { score: bestScore, move: bestMove };
+      } else {
+        let bestScore = Infinity;
+        for (const mv of moves) {
+          const next = applyMove(board, mv);
+          const result = minimax(next, depth - 1, maxPlayerColor, opponent(currentColor), alpha, beta);
+          const score = result.score;
+          if (score < bestScore) {
+            bestScore = score;
+            bestMove = mv;
+          }
+          beta = Math.min(beta, bestScore);
+          if (beta <= alpha) break;
+        }
+        return { score: bestScore, move: bestMove };
+      }
+    }
+
+    function chooseMinimaxMove(board, color) {
+      const count = generateLegalMoves(board, color).length;
+      const depth = count <= 12 ? 3 : 2;
+      return minimax(board, depth, color, color, -Infinity, Infinity).move;
+    }
+
+    function chooseMove(board, color, mode) {
+      return mode === 'minimax'
+        ? chooseMinimaxMove(board, color)
+        : chooseHeuristicMove(board, color);
+    }
+
+    function gridName(r, c) {
+      return COLS[c] + (r + 1);
+    }
+
+    function gameStatusText(board) {
+      return board.map(row => ' ' + row.join(' ')).join('\n') + '\n\n';
+    }
+
+    function stepLogText(logs) {
+      if (!logs.length) return '';
+      return logs.map(x => `${x.step}\t${x.color}\t${x.from}\t${x.to}`).join('\n') + '\n';
+    }
+
+    function resultSummaryText() {
+      return [
+        `Black AI: ${state.blackMode}`,
+        `White AI: ${state.whiteMode}`,
+        `Speed: ${STEP_INTERVAL}ms / step`,
+        `Result: ${state.finalReason}`,
+        `Total Steps: ${state.logs.length}`
+      ].join('\n') + '\n';
+    }
+
+    function downloadFile(name, text) {
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function runOneGame() {
+      stopPlayback();
+      STEP_INTERVAL = getSelectedSpeed();
+
+      state.blackMode = blackAI.value;
+      state.whiteMode = whiteAI.value;
+      state.board = cloneBoard(initialBoard);
+      state.logs = [];
+      state.snapshots = [{
+        board: cloneBoard(initialBoard),
+        label: 'Initial Board',
+        turn: 'black',
+        lastMove: null
+      }];
+      state.currentIndex = 0;
+      state.currentTurn = 'black';
+      state.winner = null;
+      state.finalReason = '比賽進行中';
+      state.lastMove = null;
+
+      let board = cloneBoard(initialBoard);
+      let turn = 'black';
+
+      for (let step = 1; step <= MAX_STEPS; step++) {
+        const mode = turn === 'black' ? state.blackMode : state.whiteMode;
+        const move = chooseMove(board, turn, mode);
+
+        if (!move) {
+          state.finalReason = `${turn} 無合法步可走，${opponent(turn)} wins`;
+          state.winner = opponent(turn);
+          state.snapshots.push({
+            board: cloneBoard(board),
+            label: `${turn} 無合法步可走`,
+            turn,
+            lastMove: null
+          });
+          break;
+        }
+
+        const record = {
+          step,
+          color: turn,
+          from: gridName(move.sr, move.sc),
+          to: gridName(move.tr, move.tc),
+          ai: mode
+        };
+
+        board = applyMove(board, move);
+        state.logs.push(record);
+        state.snapshots.push({
+          board: cloneBoard(board),
+          label: `Step ${step}: ${turn} (${mode}) ${record.from} → ${record.to}`,
+          turn: opponent(turn),
+          lastMove: move
+        });
+
+        const meWin = isConnected(board, turn);
+        const enemyWin = isConnected(board, opponent(turn));
+
+        if (meWin || enemyWin) {
+          state.winner = turn;
+          if (meWin && enemyWin) {
+            state.finalReason = `${turn} move 後雙方同時連通，依規則 ${turn} wins`;
+          } else {
+            state.finalReason = `${turn} 已連成一塊，${turn} wins`;
+          }
+          break;
+        }
+
+        turn = opponent(turn);
+      }
+
+      if (!state.winner && state.logs.length >= MAX_STEPS) {
+        state.finalReason = `總步數超過 ${MAX_STEPS}，draw`;
+      }
+
+      if (!state.winner && state.finalReason === '比賽進行中') {
+        state.finalReason = 'draw';
+      }
+
+      renderLogs();
+      updateBadges();
+      renderSnapshot();
+      startPlayback();
+    }
+
+    function renderBoard(snapshot) {
+      const board = snapshot.board;
+      const move = snapshot.lastMove;
+      boardEl.innerHTML = '';
+
+      boardEl.appendChild(axisCell(''));
+      for (let c = 0; c < BOARD_SIZE; c++) boardEl.appendChild(axisCell(COLS[c]));
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        boardEl.appendChild(axisCell(String(r + 1)));
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const div = document.createElement('div');
+          div.className = 'cell ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+
+          if (move) {
+            if (move.sr === r && move.sc === c) div.classList.add('from');
+            if (move.tr === r && move.tc === c) div.classList.add('to');
+          }
+
+          const piece = board[r][c];
+          if (piece !== EMPTY) {
+            const p = document.createElement('div');
+            p.className = 'piece ' + (piece === BLACK ? 'black' : 'white');
+            div.appendChild(p);
+          }
+          boardEl.appendChild(div);
+        }
+      }
+    }
+
+    function axisCell(text) {
+      const div = document.createElement('div');
+      div.className = 'axis';
+      div.textContent = text;
+      return div;
+    }
+
+    function renderSnapshot() {
+      const snap = state.snapshots[state.currentIndex] || state.snapshots[0];
+      renderBoard(snap);
+      descBox.textContent = snap.label || 'Initial Board';
+    }
+
+    function renderLogs() {
+      if (!state.logs.length) {
+        logBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>';
+        return;
+      }
+
+      logBody.innerHTML = state.logs.map((log, idx) => `
+        <tr class="${idx + 1 === state.currentIndex ? 'active' : ''}">
+          <td>${log.step}</td>
+          <td>${log.color}</td>
+          <td>${log.from}</td>
+          <td>${log.to}</td>
+          <td>${log.ai}</td>
+        </tr>
+      `).join('');
+    }
+
+    function updateBadges() {
+      modeBadge.textContent = `black: ${state.blackMode} / white: ${state.whiteMode}`;
+      stepBadge.textContent = `目前步數：${Math.min(state.currentIndex, state.logs.length)} / ${MAX_STEPS}`;
+
+      const snap = state.snapshots[state.currentIndex] || state.snapshots[0];
+      turnBadge.textContent = `輪到：${snap.turn || 'black'}`;
+
+      const ratio = state.snapshots.length > 1
+        ? (state.currentIndex / (state.snapshots.length - 1)) * 100
+        : 0;
+      progressBar.style.width = ratio + '%';
+
+      let cls = 'badge';
+      if (state.finalReason.includes('wins')) cls += ' win';
+      if (state.finalReason.includes('draw')) cls += ' draw';
+      resultBadge.className = cls;
+      resultBadge.textContent = `結果：${state.finalReason}`;
+
+      updateSpeedBadge();
+    }
+
+    document.getElementById('startBtn').addEventListener('click', runOneGame);
+
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      if (state.playing) {
+        stopPlayback();
+      } else if (state.currentIndex < state.snapshots.length - 1) {
+        STEP_INTERVAL = getSelectedSpeed();
+        updateBadges();
+        startPlayback();
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', resetState);
+
+    document.getElementById('dlInit').addEventListener('click', () => {
+      downloadFile('GameStatus_initial.txt', gameStatusText(initialBoard));
+    });
+
+    document.getElementById('dlFinal').addEventListener('click', () => {
+      const finalBoard = state.snapshots[state.snapshots.length - 1].board;
+      downloadFile('GameStatus_final.txt', gameStatusText(finalBoard));
+    });
+
+    document.getElementById('dlLog').addEventListener('click', () => {
+      downloadFile('StepLog.txt', stepLogText(state.logs));
+    });
+
+    document.getElementById('dlSummary').addEventListener('click', () => {
+      downloadFile('ResultSummary.txt', resultSummaryText());
+    });
+
+    blackAI.addEventListener('change', () => {
+      state.blackMode = blackAI.value;
+      updateBadges();
+    });
+
+    whiteAI.addEventListener('change', () => {
+      state.whiteMode = whiteAI.value;
+      updateBadges();
+    });
+
+    speedSelect.addEventListener('change', () => {
+      STEP_INTERVAL = getSelectedSpeed();
+      updateBadges();
+
+      if (state.playing) {
+        startPlayback();
+      }
+    });
+
+    resetState();
+  </script>
+</body>
+</html>

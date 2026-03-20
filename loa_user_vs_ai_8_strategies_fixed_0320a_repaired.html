@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOA User vs AI</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --primary: #2563eb;
+      --primary-2: #1d4ed8;
+      --board-dark: #d79a45;
+      --board-light: #e6c083;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #f8fafc 40%, #fff7ed);
+      color: var(--text);
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    .top { display: grid; grid-template-columns: 1.3fr 0.9fr; gap: 20px; align-items: start; }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(229,231,235,.8);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      overflow: hidden;
+    }
+    .head { padding: 22px 22px 8px; }
+    .head h1, .head h2, p { margin: 0; }
+    .head h1 { font-size: 30px; }
+    .sub { color: var(--muted); margin-top: 8px; line-height: 1.55; }
+    .body { padding: 18px 22px 22px; }
+    .controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+    .field label { display: block; font-size: 14px; margin-bottom: 6px; color: var(--muted); font-weight: 600; }
+    .field select, .field .infoBox {
+      width: 100%; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line); background: #fff; font-size: 15px;
+      min-height: 43px; display: flex; align-items: center;
+    }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    button {
+      border: 0; border-radius: 14px; padding: 11px 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: .2s ease;
+    }
+    button.primary { background: var(--primary); color: white; }
+    button.primary:hover { background: var(--primary-2); }
+    button.secondary { background: #f3f4f6; color: var(--text); }
+    button.secondary:hover { background: #e5e7eb; }
+    button.outline { background: white; color: var(--text); border: 1px solid var(--line); }
+    button.outline:hover { background: #f9fafb; }
+    .statusbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .badge {
+      display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: #f3f4f6; font-size: 13px; font-weight: 700;
+    }
+    .badge.win { background: #dcfce7; color: #166534; }
+    .badge.draw { background: #fef3c7; color: #92400e; }
+    .progress { width: 100%; height: 12px; border-radius: 999px; background: #e5e7eb; overflow: hidden; margin-bottom: 16px; }
+    .progress > div { height: 100%; width: 0%; background: linear-gradient(90deg, #60a5fa, #2563eb); transition: width .18s linear; }
+    .board-panel { display: flex; justify-content: center; padding: 4px 0 12px; }
+    .board-shell {
+      background: #7c4a17; border-radius: 28px; padding: 18px; box-shadow: inset 0 2px 0 rgba(255,255,255,.1), 0 18px 38px rgba(0,0,0,.15);
+    }
+    .board {
+      display: grid; grid-template-columns: 34px repeat(7, 58px); grid-template-rows: 34px repeat(7, 58px); gap: 6px; align-items: center; justify-items: center;
+    }
+    .axis { font-weight: 800; color: #fffbeb; opacity: .95; user-select: none; }
+    .cell {
+      width: 58px; height: 58px; border-radius: 14px; position: relative; transition: transform .16s ease, box-shadow .16s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
+    .cell.light { background: var(--board-light); }
+    .cell.dark { background: var(--board-dark); }
+    .cell.clickable { cursor: pointer; }
+    .cell.from { outline: 4px solid rgba(37,99,235,.7); }
+    .cell.to { outline: 4px solid rgba(234,179,8,.85); }
+    .cell.selected { outline: 4px solid rgba(59,130,246,.95); }
+    .cell.legal { box-shadow: inset 0 0 0 4px rgba(34,197,94,.9), inset 0 1px 0 rgba(255,255,255,.25); }
+    .piece {
+      position: absolute; inset: 9px; border-radius: 999px; box-shadow: 0 6px 12px rgba(0,0,0,.18);
+    }
+    .piece.black { background: radial-gradient(circle at 30% 30%, #3f3f46, #09090b 68%); border: 1px solid #18181b; }
+    .piece.white { background: radial-gradient(circle at 30% 30%, #ffffff, #e5e7eb 78%); border: 1px solid #d1d5db; }
+    .desc { background: #f8fafc; border-radius: 18px; padding: 14px 16px; color: #334155; line-height: 1.6; min-height: 72px; }
+    .grid-right { display: grid; gap: 20px; }
+    .download-list, .rule-list { display: grid; gap: 10px; }
+    .small { color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .log-wrap { max-height: 420px; overflow: auto; border: 1px solid var(--line); border-radius: 18px; background: white; }
+    .process-wrap { max-height: 640px; overflow: auto; border: 1px solid var(--line); border-radius: 18px; background: #ffffff; padding: 14px 16px; }
+    .process-text { margin: 0; white-space: pre-wrap; font-family: "Consolas", "Courier New", monospace; font-size: 14px; line-height: 1.5; color: #111827; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; text-align: left; font-size: 14px; }
+    th { position: sticky; top: 0; background: #f8fafc; z-index: 1; }
+    .footer-note { margin-top: 16px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+    @media (max-width: 980px) {
+      .top, .two-col, .controls { grid-template-columns: 1fr; }
+      .board { grid-template-columns: 28px repeat(7, 44px); grid-template-rows: 28px repeat(7, 44px); gap: 5px; }
+      .cell { width: 44px; height: 44px; border-radius: 10px; }
+      .piece { inset: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <section class="card">
+        <div class="head">
+          <h1>LOA 使用者 vs AI</h1>
+          <p class="sub">已改成 User 跟 AI 對戰模式。User 可選 black / white，AI 可選 minimax / heuristic。若 User 選 black，AI 自動為 white；若 User 選 white，AI 自動為 black。輪到你時，用滑鼠先點自己的棋子，再點合法目的地。</p>
+        </div>
+        <div class="body">
+          <div class="controls">
+            <div class="field">
+              <label for="userColor">User</label>
+              <select id="userColor">
+                <option value="black">black</option>
+                <option value="white">white</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="aiMode">AI</label>
+              <select id="aiMode">
+                <option value="minimax">minimax</option>
+                <option value="heuristic">heuristic</option>
+                <option value="alphabeta_pro">alphabeta_pro</option>
+                <option value="hybrid_endgame">hybrid_endgame</option>
+                <option value="iterative">iterative</option>
+                <option value="killer">killer</option>
+                <option value="transposition">transposition</option>
+                <option value="tournament">tournament</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>對戰配置</label>
+              <div id="roleInfo" class="infoBox">User: black / AI: white</div>
+            </div>
+          </div>
+
+          <div class="btns">
+            <button class="primary" id="startBtn">開始新對局</button>
+            <button class="secondary" id="aiMoveBtn">AI 下一步</button>
+            <button class="outline" id="resetBtn">重設</button>
+          </div>
+
+          <div class="statusbar">
+            <span class="badge" id="modeBadge">User: black / AI: white (minimax)</span>
+            <span class="badge" id="stepBadge">目前步數：0 / 50</span>
+            <span class="badge" id="turnBadge">輪到：black</span>
+            <span class="badge" id="resultBadge">結果：尚未開始</span>
+          </div>
+
+          <div class="progress"><div id="progressBar"></div></div>
+
+          <div class="board-panel">
+            <div class="board-shell">
+              <div class="board" id="board"></div>
+            </div>
+          </div>
+
+          <div class="desc" id="descBox">初始棋盤已載入。按下「開始新對局」後開始，輪到你時用滑鼠點選棋子與目的地。</div>
+        </div>
+      </section>
+
+      <div class="grid-right">
+        <section class="card">
+          <div class="head"><h2>開局棋盤與規則重點</h2></div>
+          <div class="body">
+            <div class="two-col">
+              <div>
+                <p class="small">初始棋盤：</p>
+                <pre class="small" style="background:#f8fafc;padding:12px;border-radius:14px;border:1px solid var(--line);overflow:auto;"> . X X X X X .
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ . X X X X X .
+</pre>
+              </div>
+              <div>
+                <p class="small">規則摘要：</p>
+                <div class="rule-list small">
+                  <div>1. 黑子先下，雙方輪流移動。</div>
+                  <div>2. 可沿橫、直、斜線移動，步數等於該方向整條線上的棋子總數。</div>
+                  <div>3. 終點可為空格或敵方棋子；若為敵方棋子則吃掉。</div>
+                  <div>4. 可穿越己方棋子，但不可穿越敵方棋子。</div>
+                  <div>5. 全部己方棋子連成一塊即獲勝；若雙方同時連通，移動者獲勝。</div>
+                  <div>6. 無合法步可走者敗；總步數超過 50 則和局。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>上傳目前對局檔案</h2></div>
+          <div class="body">
+            <div class="download-list">
+              <label class="outline" style="display:block;padding:12px 14px;border-radius:14px;cursor:pointer;text-align:center;">
+                上傳 GameStatus_initial.txt
+                <input type="file" id="uploadGameStatus" accept=".txt" style="display:none;">
+              </label>
+              <label class="outline" style="display:block;padding:12px 14px;border-radius:14px;cursor:pointer;text-align:center;">
+                上傳 StepLog.txt
+                <input type="file" id="uploadStepLog" accept=".txt" style="display:none;">
+              </label>
+              <button class="primary" id="loadUploadedBtn">依上傳檔案載入並續玩</button>
+            </div>
+            <div class="footer-note" id="uploadStatus">可載入目前對局，然後繼續由 User 和 AI 接著下。</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>Step Log</h2></div>
+          <div class="body">
+            <div class="log-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Color</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody id="logBody">
+                  <tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>整個過程棋譜</h2></div>
+          <div class="body">
+            <p class="small" style="margin-bottom:10px;">會像你圖片那樣，顯示每一步的移動與該步後的棋盤。</p>
+            <div class="process-wrap">
+              <pre class="process-text" id="processText">Board:
+ . X X X X X .
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ O . . . . . O
+ . X X X X X .</pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><h2>下載結果檔案</h2></div>
+          <div class="body">
+            <div class="download-list">
+              <button class="outline" id="dlInit">下載 GameStatus_initial.txt</button>
+              <button class="outline" id="dlFinal">下載 GameStatus_final.txt</button>
+              <button class="outline" id="dlLog">下載 StepLog.txt</button>
+              <button class="outline" id="dlProcess">下載 FullProcess.txt</button>
+              <button class="outline" id="dlSummary">下載 ResultSummary.txt</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_SIZE = 7;
+    const EMPTY = '.';
+    const BLACK = 'X';
+    const WHITE = 'O';
+    const MAX_STEPS = 50;
+    const COLS = ['A','B','C','D','E','F','G'];
+    const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+    const initialBoard = [
+      ['.','X','X','X','X','X','.'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['O','.','.','.','.','.','O'],
+      ['.','X','X','X','X','X','.']
+    ];
+
+    const state = {
+      board: cloneBoard(initialBoard),
+      logs: [],
+      userColor: 'black',
+      aiColor: 'white',
+      aiMode: 'minimax',
+      currentTurn: 'black',
+      finalReason: '尚未開始',
+      winner: null,
+      lastMove: null,
+      selected: null,
+      legalTargets: [],
+      loadedStepCount: 0,
+      baseBoard: cloneBoard(initialBoard)
+    };
+
+    const boardEl = document.getElementById('board');
+    const logBody = document.getElementById('logBody');
+    const processText = document.getElementById('processText');
+    const progressBar = document.getElementById('progressBar');
+    const descBox = document.getElementById('descBox');
+    const modeBadge = document.getElementById('modeBadge');
+    const stepBadge = document.getElementById('stepBadge');
+    const turnBadge = document.getElementById('turnBadge');
+    const resultBadge = document.getElementById('resultBadge');
+    const userColorSelect = document.getElementById('userColor');
+    const aiModeSelect = document.getElementById('aiMode');
+    const roleInfo = document.getElementById('roleInfo');
+    const uploadGameStatus = document.getElementById('uploadGameStatus');
+    const uploadStepLog = document.getElementById('uploadStepLog');
+    const loadUploadedBtn = document.getElementById('loadUploadedBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    function cloneBoard(board) { return board.map(row => row.slice()); }
+    function inBounds(r, c) { return r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE; }
+    function colorToPiece(color) { return color === 'black' ? BLACK : WHITE; }
+    function opponent(color) { return color === 'black' ? 'white' : 'black'; }
+    function gridName(r, c) { return COLS[c] + (r + 1); }
+
+    function syncRoles() {
+      state.userColor = userColorSelect.value;
+      state.aiColor = opponent(state.userColor);
+      state.aiMode = aiModeSelect.value;
+      roleInfo.textContent = `User: ${state.userColor} / AI: ${state.aiColor}`;
+      updateBadges();
+    }
+
+    function setUploadStatus(msg, isError = false) {
+      uploadStatus.textContent = msg;
+      uploadStatus.style.color = isError ? '#b91c1c' : '';
+    }
+
+    function countPiecesOnLine(board, r, c, dr, dc) {
+      let rr = r, cc = c;
+      while (inBounds(rr - dr, cc - dc)) { rr -= dr; cc -= dc; }
+      let count = 0;
+      while (inBounds(rr, cc)) {
+        if (board[rr][cc] !== EMPTY) count++;
+        rr += dr;
+        cc += dc;
+      }
+      return count;
+    }
+
+    function legalMoveInDirection(board, sr, sc, dr, dc, piece) {
+      if (board[sr][sc] !== piece) return null;
+      const distance = countPiecesOnLine(board, sr, sc, dr, dc);
+      const tr = sr + dr * distance;
+      const tc = sc + dc * distance;
+      const enemy = piece === BLACK ? WHITE : BLACK;
+      if (!inBounds(tr, tc)) return null;
+      if (board[tr][tc] === piece) return null;
+      for (let step = 1; step < distance; step++) {
+        const rr = sr + dr * step;
+        const cc = sc + dc * step;
+        if (board[rr][cc] === enemy) return null;
+      }
+      return { sr, sc, tr, tc };
+    }
+
+    function generateLegalMoves(board, color) {
+      const piece = colorToPiece(color);
+      const moves = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] !== piece) continue;
+          for (const [dr, dc] of DIRS) {
+            const mv = legalMoveInDirection(board, r, c, dr, dc, piece);
+            if (mv) moves.push(mv);
+          }
+        }
+      }
+      return moves;
+    }
+
+    function applyMove(board, move) {
+      const next = cloneBoard(board);
+      next[move.tr][move.tc] = next[move.sr][move.sc];
+      next[move.sr][move.sc] = EMPTY;
+      return next;
+    }
+
+    function countPieces(board, piece) {
+      let n = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) n++;
+        }
+      }
+      return n;
+    }
+
+    function dfs(board, r, c, piece, vis) {
+      vis[r][c] = true;
+      let total = 1;
+      for (const [dr, dc] of DIRS) {
+        const nr = r + dr, nc = c + dc;
+        if (inBounds(nr, nc) && !vis[nr][nc] && board[nr][nc] === piece) total += dfs(board, nr, nc, piece, vis);
+      }
+      return total;
+    }
+
+    function isConnected(board, color) {
+      const piece = colorToPiece(color);
+      const total = countPieces(board, piece);
+      if (total === 0) return false;
+      if (total === 1) return true;
+      let sr = -1, sc = -1;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) { sr = r; sc = c; break; }
+        }
+        if (sr !== -1) break;
+      }
+      const vis = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
+      return dfs(board, sr, sc, piece, vis) === total;
+    }
+
+    function manhattanSpread(board, color) {
+      const piece = colorToPiece(color);
+      const pos = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === piece) pos.push([r, c]);
+        }
+      }
+      if (pos.length <= 1) return 0;
+      let sum = 0;
+      for (let i = 0; i < pos.length; i++) {
+        for (let j = i + 1; j < pos.length; j++) {
+          sum += Math.abs(pos[i][0] - pos[j][0]) + Math.abs(pos[i][1] - pos[j][1]);
+        }
+      }
+      return sum;
+    }
+
+    function centerScore(move) {
+      const cr = 3, cc = 3;
+      return 10 - (Math.abs(move.tr - cr) + Math.abs(move.tc - cc));
+    }
+
+    function countComponents(board, color) {
+      const piece = colorToPiece(color);
+      const vis = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
+      let comps = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] !== piece || vis[r][c]) continue;
+          comps++;
+          const stack = [[r, c]];
+          vis[r][c] = true;
+          while (stack.length) {
+            const [cr, cc] = stack.pop();
+            for (const [dr, dc] of DIRS) {
+              const nr = cr + dr, nc = cc + dc;
+              if (inBounds(nr, nc) && !vis[nr][nc] && board[nr][nc] === piece) {
+                vis[nr][nc] = true;
+                stack.push([nr, nc]);
+              }
+            }
+          }
+        }
+      }
+      return comps;
+    }
+
+    function largestComponentSize(board, color) {
+      const piece = colorToPiece(color);
+      const vis = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(false));
+      let best = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] !== piece || vis[r][c]) continue;
+          let size = 0;
+          const stack = [[r, c]];
+          vis[r][c] = true;
+          while (stack.length) {
+            const [cr, cc] = stack.pop();
+            size++;
+            for (const [dr, dc] of DIRS) {
+              const nr = cr + dr, nc = cc + dc;
+              if (inBounds(nr, nc) && !vis[nr][nc] && board[nr][nc] === piece) {
+                vis[nr][nc] = true;
+                stack.push([nr, nc]);
+              }
+            }
+          }
+          best = Math.max(best, size);
+        }
+      }
+      return best;
+    }
+
+    function adjacencyScore(board, color) {
+      const piece = colorToPiece(color);
+      let score = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] !== piece) continue;
+          for (const [dr, dc] of DIRS) {
+            const nr = r + dr, nc = c + dc;
+            if (inBounds(nr, nc) && board[nr][nc] === piece) score++;
+          }
+        }
+      }
+      return score;
+    }
+
+    function oneMoveWinExists(board, color) {
+      for (const mv of generateLegalMoves(board, color)) {
+        if (isConnected(applyMove(board, mv), color)) return true;
+      }
+      return false;
+    }
+
+    function endgameMode(board, color) {
+      const total = countPieces(board, BLACK) + countPieces(board, WHITE);
+      return total <= 12 || countComponents(board, color) <= 2 || countComponents(board, opponent(color)) <= 2;
+    }
+
+    const STRATEGY_CONFIG = {
+      heuristic:      { depth: 1, compW: 2500, largestW: 260, spreadW: 2, centerW: 18, adjW: 28, mobW: 20, countW: 400, captureBonus: 500, oneWinSelf: 0,      oneWinOpp: 0,      centralBonus: 20, iterative: false, tt: false, killer: false, endgameBoost: false },
+      minimax:        { depth: 2, compW: 2500, largestW: 260, spreadW: 2, centerW: 18, adjW: 28, mobW: 20, countW: 400, captureBonus: 200, oneWinSelf: 0,      oneWinOpp: 0,      centralBonus: 18, iterative: false, tt: false, killer: false, endgameBoost: false },
+      alphabeta_pro:  { depth: 3, compW: 2600, largestW: 280, spreadW: 2, centerW: 18, adjW: 30, mobW: 22, countW: 420, captureBonus: 220, oneWinSelf: 250000, oneWinOpp: 250000, centralBonus: 22, iterative: false, tt: false, killer: false, endgameBoost: false },
+      hybrid_endgame: { depth: 4, compW: 2800, largestW: 300, spreadW: 3, centerW: 10, adjW: 35, mobW: 22, countW: 450, captureBonus: 250, oneWinSelf: 350000, oneWinOpp: 350000, centralBonus: 18, iterative: true,  tt: false, killer: false, endgameBoost: true,  terminalWin: 8000000, endgameCompBonus: 900,  endgameLargestBonus: 240 },
+      iterative:      { depth: 3, compW: 2600, largestW: 280, spreadW: 2, centerW: 18, adjW: 30, mobW: 22, countW: 420, captureBonus: 200, oneWinSelf: 250000, oneWinOpp: 250000, centralBonus: 22, iterative: true,  tt: false, killer: false, endgameBoost: false, terminalWin: 1000000 },
+      killer:         { depth: 4, compW: 2700, largestW: 300, spreadW: 3, centerW: 12, adjW: 32, mobW: 22, countW: 430, captureBonus: 250, oneWinSelf: 320000, oneWinOpp: 340000, centralBonus: 20, iterative: true,  tt: false, killer: true,  endgameBoost: false, terminalWin: 1000000 },
+      transposition:  { depth: 4, compW: 2750, largestW: 310, spreadW: 3, centerW: 0,  adjW: 33, mobW: 22, countW: 0,   captureBonus: 250, oneWinSelf: 330000, oneWinOpp: 360000, centralBonus: 0,  iterative: true,  tt: true,  killer: false, endgameBoost: false, terminalWin: 8200000 },
+      tournament:     { depth: 5, compW: 2800, largestW: 320, spreadW: 3, centerW: 20, adjW: 35, mobW: 22, countW: 450, captureBonus: 300, oneWinSelf: 400000, oneWinOpp: 450000, centralBonus: 25, iterative: true,  tt: true,  killer: true,  endgameBoost: true,  terminalWin: 9000000, endgameCompBonus: 1200, endgameLargestBonus: 260 }
+    };
+
+    function getStrategyConfig(mode) {
+      return STRATEGY_CONFIG[mode] || STRATEGY_CONFIG.minimax;
+    }
+
+    function boardKey(board, currentColor) {
+      return currentColor + '|' + board.map(row => row.join('')).join('/');
+    }
+
+    function evaluateBoard(board, color, mode = 'minimax') {
+      const cfg = getStrategyConfig(mode);
+      const enemy = opponent(color);
+      const terminalWin = cfg.terminalWin || 1000000;
+      const myConnected = isConnected(board, color);
+      const opConnected = isConnected(board, enemy);
+      if (myConnected && opConnected) return terminalWin;
+      if (myConnected) return terminalWin;
+      if (opConnected) return -terminalWin;
+
+      const myComponents = countComponents(board, color);
+      const opComponents = countComponents(board, enemy);
+      const myLargest = largestComponentSize(board, color);
+      const opLargest = largestComponentSize(board, enemy);
+      const mySpread = manhattanSpread(board, color);
+      const opSpread = manhattanSpread(board, enemy);
+      const myMoves = generateLegalMoves(board, color).length;
+      const opMoves = generateLegalMoves(board, enemy).length;
+      const myAdj = adjacencyScore(board, color);
+      const opAdj = adjacencyScore(board, enemy);
+      const myCount = countPieces(board, colorToPiece(color));
+      const opCount = countPieces(board, colorToPiece(enemy));
+
+      let myCenterTotal = 0, opCenterTotal = 0;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === colorToPiece(color)) myCenterTotal -= Math.abs(r - 3) + Math.abs(c - 3);
+          if (board[r][c] === colorToPiece(enemy)) opCenterTotal -= Math.abs(r - 3) + Math.abs(c - 3);
+        }
+      }
+
+      let score = 0;
+      score += (opComponents - myComponents) * cfg.compW;
+      score += (myLargest - opLargest) * cfg.largestW;
+      score += (opSpread - mySpread) * cfg.spreadW;
+      score += (myAdj - opAdj) * cfg.adjW;
+      score += (myMoves - opMoves) * cfg.mobW;
+      score += (myCount - opCount) * cfg.countW;
+      score += (myCenterTotal - opCenterTotal) * cfg.centerW;
+
+      if (cfg.oneWinSelf && oneMoveWinExists(board, color)) score += cfg.oneWinSelf;
+      if (cfg.oneWinOpp && oneMoveWinExists(board, enemy)) score -= cfg.oneWinOpp;
+      if (cfg.endgameBoost && endgameMode(board, color)) {
+        score += (opComponents - myComponents) * (cfg.endgameCompBonus || 900);
+        score += (myLargest - opLargest) * (cfg.endgameLargestBonus || 240);
+      }
+      return score;
+    }
+
+    function evaluateMoveHeuristic(board, move, color, mode = 'heuristic') {
+      const cfg = getStrategyConfig(mode);
+      const enemy = opponent(color);
+      const next = applyMove(board, move);
+      let score = evaluateBoard(next, color, mode);
+      if (board[move.tr][move.tc] === colorToPiece(enemy)) score += cfg.captureBonus || 0;
+      score += ((Math.abs(move.sr - 3) + Math.abs(move.sc - 3)) - (Math.abs(move.tr - 3) + Math.abs(move.tc - 3))) * (cfg.centralBonus || 0);
+      if (isConnected(next, color)) score += 2000000;
+      if ((cfg.oneWinSelf || 0) > 0 && oneMoveWinExists(next, color)) score += Math.min(cfg.oneWinSelf, 80000);
+      if ((cfg.oneWinOpp || 0) > 0 && oneMoveWinExists(next, enemy)) score -= Math.min(cfg.oneWinOpp, 100000);
+      return score;
+    }
+
+    function chooseHeuristicMove(board, color, mode = 'heuristic') {
+      const moves = generateLegalMoves(board, color);
+      if (!moves.length) return null;
+      let best = moves[0], bestScore = -Infinity;
+      for (const mv of moves) {
+        const score = evaluateMoveHeuristic(board, mv, color, mode);
+        if (score > bestScore) { bestScore = score; best = mv; }
+      }
+      return best;
+    }
+
+    function orderMoves(board, moves, color, mode, killerMoves = null, ply = 0) {
+      return moves.slice().sort((a, b) => {
+        let sa = evaluateMoveHeuristic(board, a, color, mode);
+        let sb = evaluateMoveHeuristic(board, b, color, mode);
+        if (killerMoves && killerMoves[ply]) {
+          const [k1, k2] = killerMoves[ply];
+          if (k1 && a.sr === k1.sr && a.sc === k1.sc && a.tr === k1.tr && a.tc === k1.tc) sa += 30000;
+          if (k2 && a.sr === k2.sr && a.sc === k2.sc && a.tr === k2.tr && a.tc === k2.tc) sa += 20000;
+          if (k1 && b.sr === k1.sr && b.sc === k1.sc && b.tr === k1.tr && b.tc === k1.tc) sb += 30000;
+          if (k2 && b.sr === k2.sr && b.sc === k2.sc && b.tr === k2.tr && b.tc === k2.tc) sb += 20000;
+        }
+        return sb - sa;
+      });
+    }
+
+    function sameMove(a, b) {
+      return !!a && !!b && a.sr === b.sr && a.sc === b.sc && a.tr === b.tr && a.tc === b.tc;
+    }
+
+    function addKillerMove(killerMoves, ply, move) {
+      if (!killerMoves[ply]) killerMoves[ply] = [null, null];
+      if (!sameMove(killerMoves[ply][0], move)) {
+        killerMoves[ply][1] = killerMoves[ply][0];
+        killerMoves[ply][0] = move;
+      }
+    }
+
+    function minimaxStable(board, depth, maxPlayerColor, currentColor, alpha, beta, mode, ctx, ply = 0) {
+      const enemy = opponent(currentColor);
+      const key = ctx.tt ? `${boardKey(board, currentColor)}|${depth}|${maxPlayerColor}|${mode}` : null;
+      if (key && ctx.tt.has(key)) return { ...ctx.tt.get(key) };
+
+      if (depth <= 0) {
+        const result = { score: evaluateBoard(board, maxPlayerColor, mode), move: null };
+        if (key) ctx.tt.set(key, result);
+        return result;
+      }
+
+      if (isConnected(board, maxPlayerColor)) {
+        const result = { score: (ctx.terminalWin || 1000000) + depth, move: null };
+        if (key) ctx.tt.set(key, result);
+        return result;
+      }
+      if (isConnected(board, opponent(maxPlayerColor))) {
+        const result = { score: -(ctx.terminalWin || 1000000) - depth, move: null };
+        if (key) ctx.tt.set(key, result);
+        return result;
+      }
+
+      let moves = generateLegalMoves(board, currentColor);
+      if (!moves.length) {
+        const result = { score: currentColor === maxPlayerColor ? -999999 : 999999, move: null };
+        if (key) ctx.tt.set(key, result);
+        return result;
+      }
+
+      moves = orderMoves(board, moves, currentColor, mode, ctx.killerMoves, ply);
+      const maximizing = currentColor === maxPlayerColor;
+      let bestMove = moves[0];
+      let bestScore = maximizing ? -Infinity : Infinity;
+
+      for (const mv of moves) {
+        const next = applyMove(board, mv);
+        let nextDepth = depth - 1;
+        if (ctx.endgameBoost && endgameMode(next, maxPlayerColor) && depth >= 3) nextDepth = Math.max(1, depth - 1);
+
+        const result = minimaxStable(next, nextDepth, maxPlayerColor, enemy, alpha, beta, mode, ctx, ply + 1);
+        const score = result.score;
+
+        if (maximizing) {
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = mv;
+          }
+          alpha = Math.max(alpha, bestScore);
+          if (beta <= alpha) {
+            if (ctx.useKiller) addKillerMove(ctx.killerMoves, ply, mv);
+            break;
+          }
+        } else {
+          if (score < bestScore) {
+            bestScore = score;
+            bestMove = mv;
+          }
+          beta = Math.min(beta, bestScore);
+          if (beta <= alpha) {
+            if (ctx.useKiller) addKillerMove(ctx.killerMoves, ply, mv);
+            break;
+          }
+        }
+      }
+
+      const finalResult = { score: bestScore, move: bestMove };
+      if (key) ctx.tt.set(key, finalResult);
+      return finalResult;
+    }
+
+    function getSearchDepth(board, color, mode) {
+      const total = generateLegalMoves(board, color).length + generateLegalMoves(board, opponent(color)).length;
+      if (mode === 'heuristic') return 1;
+      if (mode === 'minimax') return total <= 18 ? 3 : total <= 32 ? 2 : 2;
+      if (mode === 'alphabeta_pro') return total <= 18 ? 4 : total <= 28 ? 3 : 2;
+      if (mode === 'hybrid_endgame') {
+        if (endgameMode(board, color)) {
+          if (total <= 16) return 6;
+          if (total <= 24) return 5;
+          return 4;
+        }
+        if (total <= 18) return 5;
+        if (total <= 30) return 4;
+        if (total <= 42) return 3;
+        return 2;
+      }
+      if (mode === 'iterative') return total <= 16 ? 4 : total <= 24 ? 3 : 2;
+      if (mode === 'killer') return total <= 16 ? 4 : total <= 24 ? 3 : 2;
+      if (mode === 'transposition') {
+        if (total <= 16) return 7;
+        if (total <= 24) return 6;
+        if (total <= 36) return 5;
+        return 4;
+      }
+      if (mode === 'tournament') {
+        if (endgameMode(board, color)) {
+          if (total <= 16) return 7;
+          if (total <= 24) return 6;
+          return 5;
+        }
+        if (total <= 18) return 6;
+        if (total <= 28) return 5;
+        if (total <= 40) return 4;
+        return 3;
+      }
+      return 2;
+    }
+
+    function chooseSearchMove(board, color, mode) {
+      const moves = generateLegalMoves(board, color);
+      if (!moves.length) return null;
+
+      const cfg = getStrategyConfig(mode);
+      const ordered = orderMoves(board, moves, color, mode);
+      for (const mv of ordered) {
+        if (isConnected(applyMove(board, mv), color)) return mv;
+      }
+
+      const moveCount = ordered.length + generateLegalMoves(board, opponent(color)).length;
+      let maxDepth = Math.max(1, getSearchDepth(board, color, mode));
+
+      // 防止 hybrid_endgame / transposition / tournament 在前端搜尋過深時卡死
+      if (moveCount >= 36) maxDepth = Math.min(maxDepth, 3);
+      else if (moveCount >= 28) maxDepth = Math.min(maxDepth, 4);
+      else if (moveCount >= 20) maxDepth = Math.min(maxDepth, 5);
+
+      if (mode === 'hybrid_endgame' && !endgameMode(board, color)) {
+        maxDepth = Math.min(maxDepth, 4);
+      }
+      if (mode === 'transposition') {
+        maxDepth = Math.min(maxDepth, moveCount <= 18 ? 5 : 4);
+      }
+      if (mode === 'tournament') {
+        maxDepth = Math.min(maxDepth, endgameMode(board, color) ? 5 : 4);
+      }
+
+      let best = ordered[0];
+      let bestFallbackScore = -Infinity;
+      for (const mv of ordered) {
+        const s = evaluateMoveHeuristic(board, mv, color, mode);
+        if (s > bestFallbackScore) {
+          bestFallbackScore = s;
+          best = mv;
+        }
+      }
+
+      const runAtDepth = (depth) => {
+        const ctx = {
+          tt: cfg.tt ? new Map() : null,
+          useKiller: !!cfg.killer,
+          killerMoves: {},
+          endgameBoost: !!cfg.endgameBoost,
+          terminalWin: cfg.terminalWin || 1000000
+        };
+
+        let bestAtDepth = best;
+        let bestScore = -Infinity;
+        for (const mv of ordered) {
+          const captured = board[mv.tr][mv.tc] === colorToPiece(opponent(color));
+          const result = minimaxStable(applyMove(board, mv), Math.max(0, depth - 1), color, opponent(color), -Infinity, Infinity, mode, ctx, 1);
+          const score = result.score + (captured ? (cfg.captureBonus || 0) : 0);
+          if (Number.isFinite(score) && score > bestScore) {
+            bestScore = score;
+            bestAtDepth = mv;
+          }
+        }
+        if (Number.isFinite(bestScore)) best = bestAtDepth;
+      };
+
+      try {
+        if (cfg.iterative) {
+          for (let depth = 1; depth <= maxDepth; depth++) runAtDepth(depth);
+          return best;
+        }
+        runAtDepth(maxDepth);
+        return best;
+      } catch (err) {
+        console.error('AI search fallback:', mode, err);
+        return best;
+      }
+    }
+
+    function chooseMove(board, color, mode) {
+      if (mode === 'heuristic') return chooseHeuristicMove(board, color, mode);
+      return chooseSearchMove(board, color, mode);
+    }
+    function clearSelection() {
+      state.selected = null;
+      state.legalTargets = [];
+    }
+
+    function gameStatusText(board) {
+      return board.map(row => ' ' + row.join(' ')).join('\n') + '\n\n';
+    }
+
+    function stepLogText(logs) {
+      if (!logs.length) return '';
+      return logs.map(x => `${x.step}\t${x.color}\t${x.from}\t${x.to}`).join('\n') + '\n';
+    }
+
+
+    function boardBlockText(board) {
+      return board.map(row => row.join(' ')).join('\n');
+    }
+
+    function moveSourceLabel(log) {
+      if (log.source === 'user') return 'user';
+      return log.source || (log.color === state.aiColor ? state.aiMode : 'user');
+    }
+
+    function fullProcessText(logs) {
+      let out = 'Board:\n' + boardBlockText(state.baseBoard);
+      let board = cloneBoard(state.baseBoard);
+      for (const log of logs) {
+        out += `\n\nStep ${log.step}: ${log.color} (${moveSourceLabel(log)}) ${log.from} -> ${log.to}`;
+        const f = parseMoveCoord(log.from);
+        const t = parseMoveCoord(log.to);
+        board = applyMove(board, { sr: f.r, sc: f.c, tr: t.r, tc: t.c });
+        out += '\nBoard:\n' + boardBlockText(board);
+      }
+      if (state.finalReason && state.finalReason !== '尚未開始') {
+        out += `\n\nResult: ${state.finalReason}`;
+      }
+      return out + '\n';
+    }
+
+    function resultSummaryText() {
+      return [
+        `User Color: ${state.userColor}`,
+        `AI Color: ${state.aiColor}`,
+        `AI Mode: ${state.aiMode}`,
+        `Result: ${state.finalReason}`,
+        `Total Steps: ${state.logs.length}`,
+        `Loaded Existing Steps: ${state.loadedStepCount}`
+      ].join('\n') + '\n';
+    }
+
+    function downloadFile(name, text) {
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function updateBadges() {
+      modeBadge.textContent = `User: ${state.userColor} / AI: ${state.aiColor} (${state.aiMode})`;
+      stepBadge.textContent = `目前步數：${state.logs.length} / ${MAX_STEPS}`;
+      turnBadge.textContent = `輪到：${state.currentTurn}`;
+      progressBar.style.width = `${(state.logs.length / MAX_STEPS) * 100}%`;
+      let cls = 'badge';
+      if (state.finalReason.includes('wins')) cls += ' win';
+      if (state.finalReason.includes('draw')) cls += ' draw';
+      resultBadge.className = cls;
+      resultBadge.textContent = `結果：${state.finalReason}`;
+    }
+
+    function renderLogs() {
+      if (!state.logs.length) {
+        logBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>';
+        return;
+      }
+      logBody.innerHTML = state.logs.map(log => `
+        <tr>
+          <td>${log.step}</td>
+          <td>${log.color}</td>
+          <td>${log.from}</td>
+          <td>${log.to}</td>
+          <td>${log.source}</td>
+        </tr>
+      `).join('');
+    }
+
+    function axisCell(text) {
+      const div = document.createElement('div');
+      div.className = 'axis';
+      div.textContent = text;
+      return div;
+    }
+
+    function renderBoard() {
+      boardEl.innerHTML = '';
+      boardEl.appendChild(axisCell(''));
+      for (let c = 0; c < BOARD_SIZE; c++) boardEl.appendChild(axisCell(COLS[c]));
+
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        boardEl.appendChild(axisCell(String(r + 1)));
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const div = document.createElement('div');
+          div.className = 'cell ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+          const isClickable = state.currentTurn === state.userColor && !isGameOver();
+          if (isClickable) div.classList.add('clickable');
+          if (state.lastMove && state.lastMove.sr === r && state.lastMove.sc === c) div.classList.add('from');
+          if (state.lastMove && state.lastMove.tr === r && state.lastMove.tc === c) div.classList.add('to');
+          if (state.selected && state.selected.r === r && state.selected.c === c) div.classList.add('selected');
+          if (state.legalTargets.some(m => m.tr === r && m.tc === c)) div.classList.add('legal');
+          div.addEventListener('click', () => handleCellClick(r, c));
+          const piece = state.board[r][c];
+          if (piece !== EMPTY) {
+            const p = document.createElement('div');
+            p.className = 'piece ' + (piece === BLACK ? 'black' : 'white');
+            div.appendChild(p);
+          }
+          boardEl.appendChild(div);
+        }
+      }
+    }
+
+    function renderProcess() {
+      processText.textContent = fullProcessText(state.logs);
+      processText.parentElement.scrollTop = processText.parentElement.scrollHeight;
+    }
+
+    function renderAll() {
+      renderBoard();
+      renderLogs();
+      renderProcess();
+      updateBadges();
+    }
+
+    function isGameOver() {
+      return state.finalReason.includes('wins') || state.finalReason.includes('draw');
+    }
+
+    function finishIfNeeded(lastMover) {
+      const meWin = isConnected(state.board, lastMover);
+      const enemy = opponent(lastMover);
+      const enemyWin = isConnected(state.board, enemy);
+      if (meWin || enemyWin) {
+        state.winner = lastMover;
+        state.finalReason = meWin && enemyWin ? `${lastMover} move 後雙方同時連通，依規則 ${lastMover} wins` : `${lastMover} 已連成一塊，${lastMover} wins`;
+        return true;
+      }
+      if (state.logs.length >= MAX_STEPS) {
+        state.finalReason = `總步數超過 ${MAX_STEPS}，draw`;
+        return true;
+      }
+      const nextMoves = generateLegalMoves(state.board, state.currentTurn);
+      if (!nextMoves.length) {
+        state.finalReason = `${state.currentTurn} 無合法步可走，${opponent(state.currentTurn)} wins`;
+        state.winner = opponent(state.currentTurn);
+        return true;
+      }
+      return false;
+    }
+
+    function appendMove(move, color, sourceLabel) {
+      const step = state.logs.length + 1;
+      const record = {
+        step,
+        color,
+        from: gridName(move.sr, move.sc),
+        to: gridName(move.tr, move.tc),
+        source: sourceLabel
+      };
+      state.board = applyMove(state.board, move);
+      state.logs.push(record);
+      state.lastMove = move;
+      state.currentTurn = opponent(color);
+      clearSelection();
+      finishIfNeeded(color);
+      renderAll();
+      return record;
+    }
+
+    function startNewGame() {
+      syncRoles();
+      state.baseBoard = cloneBoard(initialBoard);
+      state.board = cloneBoard(initialBoard);
+      state.logs = [];
+      state.currentTurn = 'black';
+      state.finalReason = '對局進行中';
+      state.winner = null;
+      state.lastMove = null;
+      state.loadedStepCount = 0;
+      clearSelection();
+      renderAll();
+      if (state.currentTurn === state.aiColor) {
+        descBox.textContent = '新對局開始，AI 先手。';
+        setTimeout(doAIMove, 200);
+      } else {
+        descBox.textContent = '新對局開始，輪到你。請先點自己的棋子，再點合法目的地。';
+      }
+    }
+
+    function doAIMove() {
+      if (isGameOver()) return;
+      if (state.currentTurn !== state.aiColor) {
+        descBox.textContent = `目前輪到 ${state.currentTurn}，不是 AI。`;
+        return;
+      }
+      const move = chooseMove(state.board, state.aiColor, state.aiMode);
+      if (!move) {
+        state.finalReason = `${state.aiColor} 無合法步可走，${state.userColor} wins`;
+        state.winner = state.userColor;
+        renderAll();
+        return;
+      }
+      const rec = appendMove(move, state.aiColor, state.aiMode);
+      descBox.textContent = `AI (${state.aiMode})：${rec.from} → ${rec.to}`;
+      if (!isGameOver() && state.currentTurn === state.userColor) {
+        descBox.textContent += '。現在輪到你。';
+      }
+    }
+
+    function handleCellClick(r, c) {
+      if (state.currentTurn !== state.userColor || isGameOver()) return;
+      const myPiece = colorToPiece(state.userColor);
+
+      if (!state.selected) {
+        if (state.board[r][c] !== myPiece) {
+          descBox.textContent = '請先點選你自己的棋子。';
+          return;
+        }
+        const options = generateLegalMoves(state.board, state.userColor).filter(m => m.sr === r && m.sc === c);
+        if (!options.length) {
+          descBox.textContent = '這顆棋子目前沒有合法步。';
+          return;
+        }
+        state.selected = { r, c };
+        state.legalTargets = options;
+        descBox.textContent = `已選擇 ${gridName(r, c)}，請再點一個綠框目的地。`;
+        renderAll();
+        return;
+      }
+
+      if (state.selected.r === r && state.selected.c === c) {
+        clearSelection();
+        descBox.textContent = '已取消選取。';
+        renderAll();
+        return;
+      }
+
+      if (state.board[r][c] === myPiece) {
+        const options = generateLegalMoves(state.board, state.userColor).filter(m => m.sr === r && m.sc === c);
+        if (!options.length) {
+          descBox.textContent = '這顆棋子目前沒有合法步。';
+          return;
+        }
+        state.selected = { r, c };
+        state.legalTargets = options;
+        descBox.textContent = `已改選 ${gridName(r, c)}。`;
+        renderAll();
+        return;
+      }
+
+      const chosen = state.legalTargets.find(m => m.tr === r && m.tc === c);
+      if (!chosen) {
+        descBox.textContent = '這不是合法目的地，請點綠框位置。';
+        return;
+      }
+
+      const rec = appendMove(chosen, state.userColor, 'user');
+      descBox.textContent = `User：${rec.from} → ${rec.to}`;
+      if (!isGameOver() && state.currentTurn === state.aiColor) {
+        setTimeout(doAIMove, 220);
+      }
+    }
+
+    function parseBoardText(text) {
+      const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean).slice(0, BOARD_SIZE);
+      if (lines.length !== BOARD_SIZE) throw new Error('Game Status 需包含 7 行棋盤資料');
+      const board = lines.map(line => line.split(/\s+/));
+      if (board.some(row => row.length !== BOARD_SIZE)) throw new Error('Game Status 每行需有 7 個棋盤符號');
+      for (const row of board) {
+        for (const cell of row) {
+          if (![EMPTY, BLACK, WHITE].includes(cell)) throw new Error('Game Status 只能包含 ., X, O');
+        }
+      }
+      return board;
+    }
+
+    function parseMoveCoord(coord) {
+      const m = /^([A-Ga-g])(\d)$/.exec(coord.trim());
+      if (!m) throw new Error(`座標格式錯誤：${coord}`);
+      const c = COLS.indexOf(m[1].toUpperCase());
+      const r = parseInt(m[2], 10) - 1;
+      if (!inBounds(r, c)) throw new Error(`座標超出範圍：${coord}`);
+      return { r, c };
+    }
+
+    function parseStepLogText(text, boardForValidation) {
+      const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+      const logs = [];
+      let board = cloneBoard(boardForValidation || initialBoard);
+      for (const line of lines) {
+        const parts = line.split(/\t+/);
+        if (parts.length < 4) throw new Error('Step Log 每行需至少包含 step、color、from、to');
+        const step = parseInt(parts[0], 10);
+        const color = parts[1].toLowerCase();
+        const from = parts[2];
+        const to = parts[3];
+        const source = color === state.aiColor ? state.aiMode : 'user';
+        if (!['black', 'white'].includes(color)) throw new Error(`顏色錯誤：${parts[1]}`);
+        const f = parseMoveCoord(from);
+        const t = parseMoveCoord(to);
+        if (board[f.r][f.c] !== colorToPiece(color)) throw new Error(`Step ${step} 的起點 ${from} 不是 ${color} 棋子`);
+        const legal = generateLegalMoves(board, color).find(m => m.sr === f.r && m.sc === f.c && m.tr === t.r && m.tc === t.c);
+        if (!legal) throw new Error(`Step ${step} ${from} -> ${to} 不符合目前棋盤的合法步`);
+        board = applyMove(board, legal);
+        logs.push({ step, color, from, to, source, move: legal });
+      }
+      return { logs, board };
+    }
+
+    function inferTurnFromLogs(logs) {
+      if (!logs.length) return 'black';
+      return logs[logs.length - 1].color === 'black' ? 'white' : 'black';
+    }
+
+    async function loadUploadedMatch() {
+      try {
+        if (!uploadGameStatus.files.length) throw new Error('請先上傳 GameStatus_initial.txt');
+        if (!uploadStepLog.files.length) throw new Error('請先上傳 StepLog.txt');
+        syncRoles();
+        const boardText = await uploadGameStatus.files[0].text();
+        const logText = await uploadStepLog.files[0].text();
+        const uploadedBoard = parseBoardText(boardText);
+        const parsed = parseStepLogText(logText, uploadedBoard);
+        state.baseBoard = cloneBoard(uploadedBoard);
+        state.board = cloneBoard(parsed.board);
+        state.logs = parsed.logs.map(({ move, ...rest }) => rest);
+        state.currentTurn = inferTurnFromLogs(parsed.logs);
+        state.finalReason = '已載入目前對局';
+        state.winner = null;
+        state.lastMove = parsed.logs.length ? parsed.logs[parsed.logs.length - 1].move : null;
+        state.loadedStepCount = parsed.logs.length;
+        clearSelection();
+        renderAll();
+        setUploadStatus(`已載入 ${uploadGameStatus.files[0].name} 與 ${uploadStepLog.files[0].name}。目前輪到 ${state.currentTurn}。`);
+        if (state.currentTurn === state.aiColor) {
+          descBox.textContent = '已載入對局，接著由 AI 下棋。';
+          setTimeout(doAIMove, 220);
+        } else {
+          descBox.textContent = '已載入對局，現在輪到你，請用滑鼠下棋。';
+        }
+      } catch (err) {
+        setUploadStatus(err.message || '載入失敗', true);
+      }
+    }
+
+    document.getElementById('startBtn').addEventListener('click', startNewGame);
+    document.getElementById('aiMoveBtn').addEventListener('click', doAIMove);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      state.baseBoard = cloneBoard(initialBoard);
+      state.board = cloneBoard(initialBoard);
+      state.logs = [];
+      state.currentTurn = 'black';
+      state.finalReason = '尚未開始';
+      state.winner = null;
+      state.lastMove = null;
+      state.loadedStepCount = 0;
+      clearSelection();
+      renderAll();
+      descBox.textContent = '已重設棋盤。';
+    });
+    document.getElementById('dlInit').addEventListener('click', () => downloadFile('GameStatus_initial.txt', gameStatusText(state.baseBoard)));
+    document.getElementById('dlFinal').addEventListener('click', () => downloadFile('GameStatus_final.txt', gameStatusText(state.board)));
+    document.getElementById('dlLog').addEventListener('click', () => downloadFile('StepLog.txt', stepLogText(state.logs)));
+    document.getElementById('dlProcess').addEventListener('click', () => downloadFile('FullProcess.txt', fullProcessText(state.logs)));
+    document.getElementById('dlSummary').addEventListener('click', () => downloadFile('ResultSummary.txt', resultSummaryText()));
+    uploadGameStatus.addEventListener('change', () => {
+      const name = uploadGameStatus.files.length ? uploadGameStatus.files[0].name : '未選擇';
+      setUploadStatus(`已選擇棋盤狀態檔：${name}`);
+    });
+    uploadStepLog.addEventListener('change', () => {
+      const gameName = uploadGameStatus.files.length ? uploadGameStatus.files[0].name : '尚未選擇';
+      const logName = uploadStepLog.files.length ? uploadStepLog.files[0].name : '未選擇';
+      setUploadStatus(`已選擇棋盤狀態檔：${gameName}；棋譜檔：${logName}`);
+    });
+    loadUploadedBtn.addEventListener('click', loadUploadedMatch);
+    userColorSelect.addEventListener('change', syncRoles);
+    aiModeSelect.addEventListener('change', syncRoles);
+
+    syncRoles();
+    renderAll();
+  </script>
+</body>
+</html>

@@ -239,7 +239,7 @@
       <section class="card">
         <div class="head">
           <h1>LOA 網頁版自動對戰</h1>
-          <p class="sub">開局採用題目圖片的標準 7×7 初始棋盤：黑子在上排與下排、白子在左排與右排、四角留空。按下開始後，一次只跑 1 局，可選 heuristic 或 minimax 對戰，並可切換播放速度。</p>
+          <p class="sub">開局採用題目圖片的標準 7×7 初始棋盤：黑子在上排與下排、白子在左排與右排、四角留空。按下開始後，一次只跑 1 局，可選 heuristic 或 minimax 對戰，並可切換播放速度；也可上傳 GameStatus_initial.txt 與 StepLog.txt，依題目 1~5 規則載入目前盤面與既有棋步。</p>
         </div>
         <div class="body">
           <div class="controls">
@@ -329,6 +329,27 @@
           </div>
         </section>
 
+
+
+        <section class="card">
+          <div class="head"><h2>上傳目前對局檔案</h2></div>
+          <div class="body">
+            <div class="download-list">
+              <label class="outline" style="display:block;padding:12px 14px;border-radius:14px;cursor:pointer;text-align:center;">
+                上傳 GameStatus_initial.txt
+                <input type="file" id="uploadGameStatus" accept=".txt" style="display:none;">
+              </label>
+              <label class="outline" style="display:block;padding:12px 14px;border-radius:14px;cursor:pointer;text-align:center;">
+                上傳 StepLog.txt
+                <input type="file" id="uploadStepLog" accept=".txt" style="display:none;">
+              </label>
+              <button class="primary" id="loadUploadedBtn">依上傳檔案載入並續跑</button>
+            </div>
+            <div class="footer-note" id="uploadStatus">
+              請先上傳目前棋盤狀態與棋譜。系統會依 1~5 規則：讀取 Game Status、讀取 Step Log、依黑白 AI 決定下一步、續寫棋譜，並同步更新棋盤與 Step Log。
+            </div>
+          </div>
+        </section>
 
         <section class="card">
           <div class="head"><h2>Step Log</h2></div>
@@ -428,7 +449,10 @@
       whiteMode: 'heuristic',
       currentTurn: 'black',
       finalReason: '尚未開始',
-      lastMove: null
+      lastMove: null,
+      uploadedGameStatusName: '',
+      uploadedStepLogName: '',
+      loadedStepCount: 0
     };
 
     const boardEl = document.getElementById('board');
@@ -443,6 +467,10 @@
     const blackAI = document.getElementById('blackAI');
     const whiteAI = document.getElementById('whiteAI');
     const speedSelect = document.getElementById('speedSelect');
+    const uploadGameStatus = document.getElementById('uploadGameStatus');
+    const uploadStepLog = document.getElementById('uploadStepLog');
+    const loadUploadedBtn = document.getElementById('loadUploadedBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
 
     function cloneBoard(board) {
       return board.map(row => row.slice());
@@ -454,6 +482,91 @@
 
     function updateSpeedBadge() {
       speedBadge.textContent = `速度：${STEP_INTERVAL}ms / step`;
+    }
+
+
+    function parseBoardText(text) {
+      const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean).slice(0, BOARD_SIZE);
+      if (lines.length !== BOARD_SIZE) throw new Error('Game Status 需包含 7 行棋盤資料');
+      const board = lines.map(line => line.split(/\s+/));
+      if (board.some(row => row.length !== BOARD_SIZE)) throw new Error('Game Status 每行需有 7 個棋盤符號');
+      for (const row of board) {
+        for (const cell of row) {
+          if (![EMPTY, BLACK, WHITE].includes(cell)) throw new Error('Game Status 只能包含 ., X, O');
+        }
+      }
+      return board;
+    }
+
+    function parseMoveCoord(coord) {
+      const m = /^([A-Ga-g])(\d)$/.exec(coord.trim());
+      if (!m) throw new Error(`座標格式錯誤：${coord}`);
+      const c = COLS.indexOf(m[1].toUpperCase());
+      const r = parseInt(m[2], 10) - 1;
+      if (!inBounds(r, c)) throw new Error(`座標超出範圍：${coord}`);
+      return { r, c };
+    }
+
+    function parseStepLogText(text, boardForValidation) {
+      const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+      const logs = [];
+      let board = cloneBoard(boardForValidation || initialBoard);
+
+      for (const line of lines) {
+        const parts = line.split(/\t+/);
+        if (parts.length < 4) throw new Error('Step Log 每行需至少包含 step、color、from、to');
+        const step = parseInt(parts[0], 10);
+        const color = parts[1].toLowerCase();
+        const from = parts[2];
+        const to = parts[3];
+        const ai = parts[4] || (color === 'black' ? blackAI.value : whiteAI.value);
+        if (!['black','white'].includes(color)) throw new Error(`顏色錯誤：${parts[1]}`);
+
+        const f = parseMoveCoord(from);
+        const t = parseMoveCoord(to);
+        const piece = colorToPiece(color);
+        if (board[f.r][f.c] !== piece) throw new Error(`Step ${step} 的起點 ${from} 不是 ${color} 棋子`);
+
+        const legal = generateLegalMoves(board, color).find(mv => mv.sr === f.r && mv.sc === f.c && mv.tr === t.r && mv.tc === t.c);
+        if (!legal) throw new Error(`Step ${step} ${from} -> ${to} 不符合目前棋盤的合法步`);
+
+        board = applyMove(board, legal);
+        logs.push({ step, color, from, to, ai, move: legal });
+      }
+      return { logs, board };
+    }
+
+    function inferTurnFromLogs(logs) {
+      if (!logs.length) return 'black';
+      return logs[logs.length - 1].color === 'black' ? 'white' : 'black';
+    }
+
+    function buildSnapshotsFromLogs(startBoard, logs) {
+      const snapshots = [{ board: cloneBoard(startBoard), label: 'Initial Board', turn: logs.length ? logs[0].color : 'black', lastMove: null }];
+      let board = cloneBoard(startBoard);
+      for (const log of logs) {
+        const move = log.move || { ...parseMoveCoord(log.from), ...{ tr: parseMoveCoord(log.to).r, tc: parseMoveCoord(log.to).c } };
+        const f = parseMoveCoord(log.from);
+        const t = parseMoveCoord(log.to);
+        const mv = log.move || { sr: f.r, sc: f.c, tr: t.r, tc: t.c };
+        board = applyMove(board, mv);
+        snapshots.push({
+          board: cloneBoard(board),
+          label: `Step ${log.step}: ${log.color} (${log.ai}) ${log.from} → ${log.to}`,
+          turn: opponent(log.color),
+          lastMove: mv
+        });
+      }
+      return snapshots;
+    }
+
+    async function readTextFile(file) {
+      return await file.text();
+    }
+
+    function setUploadStatus(msg, isError = false) {
+      uploadStatus.textContent = msg;
+      uploadStatus.style.color = isError ? '#b91c1c' : '';
     }
 
     function resetState() {
@@ -475,6 +588,7 @@
       state.currentTurn = 'black';
       state.finalReason = '尚未開始';
       state.lastMove = null;
+      state.loadedStepCount = 0;
       renderSnapshot();
       renderLogs();
       updateBadges();
@@ -774,7 +888,8 @@
         `White AI: ${state.whiteMode}`,
         `Speed: ${STEP_INTERVAL}ms / step`,
         `Result: ${state.finalReason}`,
-        `Total Steps: ${state.logs.length}`
+        `Total Steps: ${state.logs.length}`,
+        `Loaded Existing Steps: ${state.loadedStepCount}`
       ].join('\n') + '\n';
     }
 
@@ -788,6 +903,90 @@
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+    }
+
+
+    async function loadUploadedMatch() {
+      try {
+        if (!uploadGameStatus.files.length) throw new Error('請先上傳 GameStatus_initial.txt');
+        if (!uploadStepLog.files.length) throw new Error('請先上傳 StepLog.txt');
+
+        stopPlayback();
+        STEP_INTERVAL = getSelectedSpeed();
+        state.blackMode = blackAI.value;
+        state.whiteMode = whiteAI.value;
+
+        const boardText = await readTextFile(uploadGameStatus.files[0]);
+        const logText = await readTextFile(uploadStepLog.files[0]);
+        const uploadedBoard = parseBoardText(boardText);
+        const parsed = parseStepLogText(logText, uploadedBoard);
+
+        state.uploadedGameStatusName = uploadGameStatus.files[0].name;
+        state.uploadedStepLogName = uploadStepLog.files[0].name;
+        state.board = cloneBoard(parsed.board);
+        state.logs = parsed.logs.map(({ move, ...rest }) => rest);
+        state.snapshots = buildSnapshotsFromLogs(uploadedBoard, parsed.logs);
+        state.currentIndex = state.snapshots.length - 1;
+        state.currentTurn = inferTurnFromLogs(parsed.logs);
+        state.finalReason = '已載入目前對局，可繼續自動對戰';
+        state.winner = null;
+        state.lastMove = parsed.logs.length ? parsed.logs[parsed.logs.length - 1].move : null;
+        state.loadedStepCount = parsed.logs.length;
+
+        renderSnapshot();
+        renderLogs();
+        updateBadges();
+        setUploadStatus(`已載入 ${state.uploadedGameStatusName} 與 ${state.uploadedStepLogName}，目前可由 ${state.currentTurn} 繼續下。`);
+
+        continueFromCurrentState();
+      } catch (err) {
+        setUploadStatus(err.message || '載入失敗', true);
+      }
+    }
+
+    function continueFromCurrentState() {
+      stopPlayback();
+
+      let board = cloneBoard(state.snapshots[state.snapshots.length - 1].board);
+      let turn = state.currentTurn;
+      let step = state.logs.length + 1;
+
+      while (step <= MAX_STEPS) {
+        const mode = turn === 'black' ? state.blackMode : state.whiteMode;
+        const move = chooseMove(board, turn, mode);
+
+        if (!move) {
+          state.finalReason = `${turn} 無合法步可走，${opponent(turn)} wins`;
+          state.winner = opponent(turn);
+          state.snapshots.push({ board: cloneBoard(board), label: `${turn} 無合法步可走`, turn, lastMove: null });
+          break;
+        }
+
+        const record = { step, color: turn, from: gridName(move.sr, move.sc), to: gridName(move.tr, move.tc), ai: mode };
+        board = applyMove(board, move);
+        state.logs.push(record);
+        state.snapshots.push({ board: cloneBoard(board), label: `Step ${step}: ${turn} (${mode}) ${record.from} → ${record.to}`, turn: opponent(turn), lastMove: move });
+
+        const meWin = isConnected(board, turn);
+        const enemyWin = isConnected(board, opponent(turn));
+        if (meWin || enemyWin) {
+          state.winner = turn;
+          state.finalReason = meWin && enemyWin ? `${turn} move 後雙方同時連通，依規則 ${turn} wins` : `${turn} 已連成一塊，${turn} wins`;
+          break;
+        }
+
+        turn = opponent(turn);
+        step += 1;
+      }
+
+      if (!state.winner && state.logs.length >= MAX_STEPS) state.finalReason = `總步數超過 ${MAX_STEPS}，draw`;
+      if (!state.winner && ['已載入目前對局，可繼續自動對戰'].includes(state.finalReason)) state.finalReason = 'draw';
+
+      state.currentIndex = state.loadedStepCount;
+      renderSnapshot();
+      renderLogs();
+      updateBadges();
+      if (state.currentIndex < state.snapshots.length - 1) startPlayback();
     }
 
     function runOneGame() {
@@ -809,6 +1008,7 @@
       state.winner = null;
       state.finalReason = '比賽進行中';
       state.lastMove = null;
+      state.loadedStepCount = 0;
 
       let board = cloneBoard(initialBoard);
       let turn = 'black';
@@ -937,10 +1137,7 @@
         </tr>
       `).join('');
 
-      const activeRow = logBody.querySelector('tr.active');
-      if (activeRow) {
-        activeRow.scrollIntoView({ block: 'nearest' });
-      }
+      
     }
 
     function updateBadges() {
@@ -1003,6 +1200,20 @@
     document.getElementById('dlMatch2').addEventListener('click', () => {
       downloadFile('result_match2.txt', ATTACHMENT_MATCH2);
     });
+
+
+    uploadGameStatus.addEventListener('change', () => {
+      const name = uploadGameStatus.files.length ? uploadGameStatus.files[0].name : '未選擇';
+      setUploadStatus(`已選擇棋盤狀態檔：${name}`);
+    });
+
+    uploadStepLog.addEventListener('change', () => {
+      const gameName = uploadGameStatus.files.length ? uploadGameStatus.files[0].name : '尚未選擇';
+      const logName = uploadStepLog.files.length ? uploadStepLog.files[0].name : '未選擇';
+      setUploadStatus(`已選擇棋盤狀態檔：${gameName}；棋譜檔：${logName}`);
+    });
+
+    loadUploadedBtn.addEventListener('click', loadUploadedMatch);
 
     blackAI.addEventListener('change', () => {
       state.blackMode = blackAI.value;

@@ -265,6 +265,9 @@
                 <option value="400">400ms / step</option>
                 <option value="500">500ms / step</option>
                 <option value="1000">1000ms / step</option>
+                <option value="2000">2000ms / step</option>
+                <option value="3000">3000ms / step</option>
+                <option value="4000">4000ms / step</option>
               </select>
             </div>
           </div>
@@ -326,6 +329,32 @@
           </div>
         </section>
 
+
+        <section class="card">
+          <div class="head"><h2>Step Log</h2></div>
+          <div class="body">
+            <div class="log-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Color</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>AI</th>
+                  </tr>
+                </thead>
+                <tbody id="logBody">
+                  <tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="footer-note">
+              Step Log 會在每一步棋子更新時同步刷新，顯示目前已播放到的步數。
+            </div>
+          </div>
+        </section>
+
         <section class="card">
           <div class="head"><h2>下載結果檔案</h2></div>
           <div class="body">
@@ -355,22 +384,6 @@
           </div>
         </section>
 
-
-        <section class="card">
-          <div class="head"><h2>Step Log</h2></div>
-          <div class="body">
-            <div class="log-wrap">
-              <table>
-                <thead>
-                  <tr><th>Step</th><th>Color</th><th>From</th><th>To</th><th>AI</th></tr>
-                </thead>
-                <tbody id="logBody">
-                  <tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   </div>
@@ -907,12 +920,14 @@
     }
 
     function renderLogs() {
-      if (!state.logs.length) {
+      const visibleLogs = state.logs.slice(0, state.currentIndex);
+
+      if (!visibleLogs.length) {
         logBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:18px;">尚未開始</td></tr>';
         return;
       }
 
-      logBody.innerHTML = state.logs.map((log, idx) => `
+      logBody.innerHTML = visibleLogs.map((log, idx) => `
         <tr class="${idx + 1 === state.currentIndex ? 'active' : ''}">
           <td>${log.step}</td>
           <td>${log.color}</td>
@@ -921,6 +936,11 @@
           <td>${log.ai}</td>
         </tr>
       `).join('');
+
+      const activeRow = logBody.querySelector('tr.active');
+      if (activeRow) {
+        activeRow.scrollIntoView({ block: 'nearest' });
+      }
     }
 
     function updateBadges() {

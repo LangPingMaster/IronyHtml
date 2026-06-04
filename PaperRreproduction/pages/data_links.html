@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>資料來源與網站</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>原文連結、研究方法、成果圖表、動畫流程</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content">
+<section class="hero"><h1>資料來源、原始論文與網站</h1><p>本頁集中列出三篇核心論文的原文、PDF、資料集、GitHub、Hugging Face 與模型連結。所有連結皆設為可點擊外部連結，方便直接取得原始資料與官方說明。</p></section>
+<h2>一、核心論文與資料集連結</h2><table class="table"><tr><th>論文</th><th>原始論文</th><th>資料/程式</th><th>資料型態</th></tr><tr><td>Castro et al.（2019）MUStARD</td><td><a target="_blank" href="https://aclanthology.org/P19-1455/">ACL Anthology</a><br><a target="_blank" href="https://aclanthology.org/P19-1455.pdf">PDF</a><br><a target="_blank" href="https://arxiv.org/abs/1906.01815">arXiv</a></td><td><a target="_blank" href="https://github.com/soujanyaporia/MUStARD">GitHub / Dataset</a></td><td>英文 text + audio + video + context</td></tr><tr><td>Gao et al.（2025）MCSD</td><td><a target="_blank" href="https://www.isca-archive.org/interspeech_2025/gao25f_interspeech.html">ISCA Archive</a><br><a target="_blank" href="https://www.isca-archive.org/interspeech_2025/gao25f_interspeech.pdf">PDF</a></td><td><a target="_blank" href="https://research.rug.nl/en/datasets/mcsd-10-multimodal-chinese-sarcasm-dataset/">Dataset Portal</a><br><a target="_blank" href="https://github.com/x-y-g/MCSD/wiki">GitHub Wiki</a></td><td>中文 transcript + audio + video</td></tr><tr><td>Yue et al.（2024）SarcNet</td><td><a target="_blank" href="https://aclanthology.org/2024.lrec-main.1248/">ACL Anthology</a><br><a target="_blank" href="https://aclanthology.org/2024.lrec-main.1248.pdf">PDF</a></td><td><a target="_blank" href="https://github.com/yuetanbupt/SarcNet">GitHub</a><br><a target="_blank" href="https://huggingface.co/datasets/alita9/sarcnet">Hugging Face Dataset</a></td><td>中英文 image + text + 三層 labels</td></tr></table>
+<h2>二、資料取得流程</h2><div class="timeline"><div class="titem"><b>1、先閱讀授權</b><br>確認資料集是否允許研究、教學、再散布或只允許下載 metadata。</div><div class="titem"><b>2、下載 metadata 或 official features</b><br>MUStARD 建議先用官方 features；MCSD 先下載 metadata；SarcNet 可用 Hugging Face 載入。</div><div class="titem"><b>3、整理成本 ZIP 的資料夾格式</b><br>依照 data/mustard、data/mcsd、data/sarcnet 放置原始資料與處理後特徵。</div><div class="titem"><b>4、先跑小樣本</b><br>先用 10–30 筆確認路徑、label 與 feature 維度，再跑完整實驗。</div></div>
+<h2>三、下拉式注意事項</h2><details open><summary>為什麼 ZIP 裡沒有直接附資料？</summary><div><p>影片、圖片、社群貼文與模型權重可能受到平台條款與資料集授權限制。本 ZIP 提供可重現流程、程式碼與官方連結，但不重新散布原始資料。</p></div></details><details><summary>如果影片、圖片或貼文下架怎麼辦？</summary><div><p>先記錄缺失樣本數，優先使用官方提供的 pre-extracted features 或只重現 text-only baseline。報告中需要清楚註明資料缺失與實驗條件差異。</p></div></details><details><summary>如何把資料放到本 ZIP？</summary><div><pre><code>data/mustard/       # MUStARD metadata / clips
+features/mustard/   # MUStARD 預抽取特徵或自行抽取特徵
+data/mcsd/metadata.csv
+data/mcsd/videos/
+data/mcsd/audio/
+data/sarcnet/       # Hugging Face cache 或自行另存資料</code></pre></div></details>
+<h2>四、延伸論文連結</h2><p>完整延伸閱讀整理請看 <a href="paper_summaries.html">論文原文連結與重點總覽</a>。</p>
+<div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

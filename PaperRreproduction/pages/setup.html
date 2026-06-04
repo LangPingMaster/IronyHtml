@@ -1,0 +1,33 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>環境與硬體配備</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>資料來源、模型、流程圖、程式碼</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content"><section class="hero"><h1>環境與硬體配備</h1><p>本頁說明重現三篇論文時建議使用的電腦配備、Python 套件與資料夾結構。</p></section><h2>一、硬體配備建議</h2><details open><summary>最低可行配備</summary><div><p>CPU：Intel i7 / Ryzen 7 以上；RAM：32GB；GPU：RTX 3060 12GB 以上；SSD：1TB。可以跑 BERT embedding、Librosa、ResNet、SVM 與小型 ViT 訓練。</p></div></details><details><summary>建議研究配備</summary><div><p>CPU：Intel i9 / Ryzen 9；RAM：64GB；GPU：RTX 4090 24GB 或 A5000 / A6000；SSD：2TB。適合 TimeSformer、Wav2Vec2、VideoMAE、VLM 或 LoRA fine-tuning。</p></div></details><h2>二、Python 環境</h2><pre><code>conda create -n sarcasm-mm python=3.10
+conda activate sarcasm-mm
+pip install torch torchvision torchaudio
+pip install transformers datasets accelerate
+pip install scikit-learn pandas numpy scipy
+pip install librosa soundfile opencv-python moviepy pillow
+pip install matplotlib tqdm ffmpeg-python</code></pre><h2>三、FFmpeg 安裝</h2><pre><code>sudo apt update
+sudo apt install ffmpeg</code></pre><h2>四、資料夾結構</h2><pre><code>multimodal_sarcasm_reproduction_html/
+  code/                 # 所有 Python 範例程式
+  data/                 # 請自行放入下載後的資料集
+    mustard/
+    mcsd/
+    sarcnet/
+  features/             # 抽出來的 .npy 特徵
+  results/              # 模型輸出結果
+  pages/                # HTML 教學頁面
+  assets/               # CSS / JS / SVG 素材</code></pre><div class="ok">建議先從 MUStARD 的官方 GitHub 開始，因為它有較完整的 repository 與 baseline 程式流程。</div><div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

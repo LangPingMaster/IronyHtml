@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yue 2024 SarcNet</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>原文連結、研究方法、成果圖表、動畫流程</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content">
+<section class="hero"><h1>Yue et al.（2024）SarcNet 重現流程</h1><p>任務：中英文圖文反諷辨識。SarcNet 最大貢獻是「分離式標註」：text_label、image_label、multi_label 分開給，避免用圖文總標籤錯誤評估單模態模型。</p><div class="linkbar"><a class="btn" target="_blank" href="https://aclanthology.org/2024.lrec-main.1248/">原始論文頁</a><a class="btn secondary" target="_blank" href="https://aclanthology.org/2024.lrec-main.1248.pdf">PDF</a><a class="btn light" target="_blank" href="https://github.com/yuetanbupt/SarcNet">官方 GitHub</a><a class="btn light" target="_blank" href="https://huggingface.co/datasets/alita9/sarcnet">Hugging Face Dataset</a></div></section>
+<h2>一、論文所講述的重點</h2><div class="quote"><span class="spark"></span> 圖文反諷可能不在文字，也不在圖片，而是在文字與圖片之間的衝突。</div><details open><summary>1、研究問題</summary><div><p>很多圖文資料集只給 image-text pair 一個 sarcasm label。這會導致 text-only 模型或 image-only 模型被不公平評估，因為單看文字或單看圖片可能根本沒有反諷。SarcNet 因此把三種標籤分開：text sarcasm、image sarcasm、multimodal sarcasm。</p></div></details><details><summary>2、資料內容</summary><div><div class="metric-grid"><div class="metric"><b>3335</b><span>image-text pairs</span></div><div class="metric"><b>2065</b><span>Chinese samples</span></div><div class="metric"><b>1270</b><span>English samples</span></div><div class="metric"><b>10005</b><span>total labels</span></div><div class="metric"><b>0.9769</b><span>multimodal kappa</span></div></div><p>每筆資料都包含 image、text、text_label、image_label、multi_label 與語言類別。</p></div></details>
+<h2>二、研究方法與動畫流程</h2><div class="anim-stage"><div class="modal-dots"><div class="dot">Text label</div><div class="dot">Image label</div><div class="dot">Multi label</div><div class="dot">DT4MID</div></div><div class="fusion-line"></div><p class="mini">動畫說明：文字、圖片與圖文組合各自有自己的 ground truth，因此模型評估要按任務分開。</p></div><div class="flow"><div class="step">Weibo / Twitter<br><small>image + text</small></div><div class="arrow">→</div><div class="step">三層標註<br><small>T / V / M</small></div><div class="arrow">→</div><div class="step">XLM-R<br><small>text label</small></div><div class="arrow">→</div><div class="step">ViT<br><small>image label</small></div><div class="arrow">→</div><div class="step">DT4MID<br><small>multi label</small></div><div class="arrow">→</div><div class="step">Acc / F1<br><small>zh / en</small></div></div>
+<h2>三、原模型與演算法</h2><table class="table"><tr><th>實驗任務</th><th>輸入</th><th>標籤</th><th>模型</th><th>重現重點</th></tr><tr><td>文字單模態</td><td>text</td><td>text_label</td><td>BERT、mBERT、XLM-R</td><td>不要用 multi_label 來評估 text-only。</td></tr><tr><td>影像單模態</td><td>image</td><td>image_label</td><td>ResNet、MobileNetV3、ViT</td><td>不要用 multi_label 來評估 image-only。</td></tr><tr><td>多模態</td><td>image + text</td><td>multi_label</td><td>DT4MID + XLM-R</td><td>評估文字與圖片衝突形成的反諷。</td></tr></table>
+<h2>四、研究成果圖表</h2><div class="bars"><div class="bar-row"><span>XLM-R text F1</span><div class="bar-track"><div class="bar-fill" style="width:73.36%"></div></div><b>73.36</b></div><div class="bar-row"><span>DT4MID acc.</span><div class="bar-track"><div class="bar-fill" style="width:82.73%"></div></div><b>82.73</b></div><div class="bar-row"><span>DT4MID F1</span><div class="bar-track"><div class="bar-fill" style="width:84.40%"></div></div><b>84.40</b></div><div class="bar-row"><span>ZH F1</span><div class="bar-track"><div class="bar-fill" style="width:77.65%"></div></div><b>77.65</b></div><div class="bar-row"><span>EN F1</span><div class="bar-track"><div class="bar-fill" style="width:94.91%"></div></div><b>94.91</b></div></div><p class="chart-caption">圖表重點：多模態任務的最佳模型明顯優於單模態 baseline；英文資料表現高於中文資料，顯示中文反諷仍有研究空間。</p>
+<h2>五、執行與檢查</h2><details open><summary>載入資料</summary><div><pre><code>from datasets import load_dataset
+zh = load_dataset("alita9/sarcnet", "zh")
+en = load_dataset("alita9/sarcnet", "en")</code></pre></div></details><details><summary>執行程式</summary><div><pre><code>python code/reproduce_sarcnet.py --language zh --output results/sarcnet_zh_results.csv
+python code/reproduce_sarcnet.py --language en --output results/sarcnet_en_results.csv</code></pre></div></details><details><summary>重現檢查表</summary><div><p>確認資料分成 zh / en，確認三個 label 欄位沒有混用；文字模型用 text_label，影像模型用 image_label，多模態模型用 multi_label。</p></div></details>
+<div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

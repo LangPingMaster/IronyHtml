@@ -1,0 +1,27 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Castro 2019 MUStARD</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>原文連結、研究方法、成果圖表、動畫流程</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content">
+<section class="hero"><h1>Castro et al.（2019）MUStARD 重現流程</h1><p>任務：英文影音文字反諷辨識。核心做法是把 target utterance 的文字、語音、影像，以及前文 conversation context 轉成向量，再以 early fusion 與分類器判斷 sarcastic / non-sarcastic。</p><div class="linkbar"><a class="btn" target="_blank" href="https://aclanthology.org/P19-1455/">原始論文頁</a><a class="btn secondary" target="_blank" href="https://aclanthology.org/P19-1455.pdf">PDF</a><a class="btn light" target="_blank" href="https://github.com/soujanyaporia/MUStARD">官方 GitHub / Dataset</a><a class="btn light" target="_blank" href="https://arxiv.org/abs/1906.01815">arXiv</a></div></section>
+<h2>一、論文所講述的重點</h2><div class="quote"><span class="spark"></span> 反諷常不是只靠字面文字判斷，而是需要語調、表情、臉部動作與前文語境一起解讀。</div><details open><summary>1、研究問題</summary><div><p>文字模型在遇到反諷時容易誤判，因為表面情緒與真正意圖常相反。MUStARD 的研究問題是：加入 audio、video 與 conversational context 是否能提升 sarcasm detection？</p></div></details><details><summary>2、資料內容</summary><div><p>資料來自 Friends、The Big Bang Theory、The Golden Girls 等節目片段。每筆資料是一段 utterance，並附上 label、speaker、transcript、preceding context，以及影音片段。</p><div class="metric-grid"><div class="metric"><b>690</b><span>balanced utterances</span></div><div class="metric"><b>345</b><span>sarcastic</span></div><div class="metric"><b>345</b><span>non-sarcastic</span></div><div class="metric"><b>4</b><span>主要模態/語境線索</span></div></div></div></details>
+<h2>二、研究方法與模型流程動畫</h2><div class="anim-stage"><div class="modal-dots"><div class="dot">Context</div><div class="dot">Text</div><div class="dot">Audio</div><div class="dot">Video</div></div><div class="fusion-line"></div><p class="mini">動畫說明：前文語境、文字、聲音、畫面先分別抽特徵，再串接成一個融合向量。</p></div><div class="flow"><div class="step">sarcasm_data.json<br><small>label / speaker / context</small></div><div class="arrow">→</div><div class="step">BERT / GloVe<br><small>文字與語境</small></div><div class="arrow">→</div><div class="step">Librosa<br><small>音高、MFCC、能量</small></div><div class="arrow">→</div><div class="step">ResNet / CNN<br><small>臉部與畫面特徵</small></div><div class="arrow">→</div><div class="step">SVM / Fusion<br><small>F1-score</small></div></div>
+<h2>三、原模型與演算法</h2><table class="table"><tr><th>模態</th><th>模型/演算法</th><th>重現時要做什麼</th></tr><tr><td>文字</td><td>BERT-Base 或官方文字 features</td><td>把 utterance 與 context 轉成 768 維左右的句向量。</td></tr><tr><td>語音</td><td>Librosa acoustic features</td><td>從 wav 中抽 MFCC、delta、spectral centroid、pitch/energy 等。</td></tr><tr><td>視覺</td><td>ResNet-152 / CNN visual features</td><td>從影片 frames 抽取人物表情與畫面語意。</td></tr><tr><td>融合</td><td>Early fusion + SVM</td><td>把不同向量 concatenate，使用 train/test split 評估 F1。</td></tr></table>
+<h2>四、研究成果圖表</h2><div class="bars"><div class="bar-row"><span>Text</span><div class="bar-track"><div class="bar-fill" style="width:64.6%"></div></div><b>64.6</b></div><div class="bar-row"><span>Audio</span><div class="bar-track"><div class="bar-fill" style="width:64.6%"></div></div><b>64.6</b></div><div class="bar-row"><span>Visual</span><div class="bar-track"><div class="bar-fill" style="width:67.4%"></div></div><b>67.4</b></div><div class="bar-row"><span>Text + Visual</span><div class="bar-track"><div class="bar-fill" style="width:71.6%"></div></div><b>71.6</b></div><div class="bar-row"><span>Text + Audio + Visual</span><div class="bar-track"><div class="bar-fill" style="width:71.5%"></div></div><b>71.5</b></div></div><p class="chart-caption">F1 目標值為教學重現參考；實際重現會因 random split、feature 版本與分類器參數而略有差異。</p>
+<h2>五、執行與檢查</h2><details open><summary>資料取得與放置</summary><div><pre><code>git clone https://github.com/soujanyaporia/MUStARD.git
+# 依官方 README 下載 metadata、clips 或 pre-extracted features
+# 放到 data/mustard/ 與 features/mustard/</code></pre></div></details><details><summary>執行程式</summary><div><pre><code>cd multimodal_sarcasm_reproduction_html
+python code/reproduce_mustard.py --metadata data/mustard/sarcasm_data.json --feature_dir features/mustard --output results/mustard_results.csv</code></pre></div></details><details><summary>重現檢查表</summary><div><p>確認 label 數量 balanced、每個 utterance 都有 text/audio/visual features、train/test split 與論文設定一致，並檢查 SVM kernel、C、gamma 是否與 baseline 接近。</p></div></details>
+<div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

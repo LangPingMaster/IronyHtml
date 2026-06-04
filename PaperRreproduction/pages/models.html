@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>開源模型與使用方法</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>資料來源、模型、流程圖、程式碼</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content"><section class="hero"><h1>開源模型與使用方法</h1><p>本頁整理三篇論文重現會用到的模型、開源連結與基本使用方向。</p></section><h2>一、文字模型</h2><table class="table"><tr><th>模型</th><th>用途</th><th>連結</th></tr><tr><td>BERT Base / bert-base-uncased</td><td>MUStARD 英文文字特徵</td><td>https://huggingface.co/google-bert/bert-base-uncased</td></tr><tr><td>bert-base-chinese</td><td>MCSD 中文文字特徵</td><td>https://huggingface.co/google-bert/bert-base-chinese</td></tr><tr><td>XLM-RoBERTa</td><td>SarcNet 中英文文字特徵</td><td>https://huggingface.co/FacebookAI/xlm-roberta-base</td></tr></table><h2>二、語音模型</h2><table class="table"><tr><th>模型/工具</th><th>用途</th><th>連結</th></tr><tr><td>Librosa</td><td>MUStARD 抽 MFCC、Mel、Spectral centroid</td><td>https://librosa.org/</td></tr><tr><td>Chinese Wav2Vec2</td><td>MCSD 中文語音 embedding</td><td>https://huggingface.co/jonatasgrosman/wav2vec2-large-xlsr-53-chinese-zh-cn</td></tr></table><h2>三、視覺/影片模型</h2><table class="table"><tr><th>模型</th><th>用途</th><th>連結</th></tr><tr><td>ResNet-152</td><td>MUStARD frame feature</td><td>https://pytorch.org/vision/main/models/generated/torchvision.models.resnet152.html</td></tr><tr><td>TimeSformer</td><td>MCSD 影片特徵</td><td>https://github.com/facebookresearch/TimeSformer</td></tr><tr><td>ViT</td><td>SarcNet 圖片特徵</td><td>https://huggingface.co/google/vit-base-patch16-224</td></tr></table><h2>四、模型使用簡例</h2><details open><summary>載入中文 BERT</summary><div><pre><code>from transformers import AutoTokenizer, AutoModel
+model_name = "google-bert/bert-base-chinese"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)</code></pre></div></details><details><summary>載入 XLM-RoBERTa</summary><div><pre><code>from transformers import AutoTokenizer, AutoModelForSequenceClassification
+model_name = "FacebookAI/xlm-roberta-base"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)</code></pre></div></details><details><summary>載入 ViT</summary><div><pre><code>from transformers import AutoImageProcessor, ViTForImageClassification
+model_name = "google/vit-base-patch16-224"
+processor = AutoImageProcessor.from_pretrained(model_name)
+model = ViTForImageClassification.from_pretrained(model_name, num_labels=2, ignore_mismatched_sizes=True)</code></pre></div></details><div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

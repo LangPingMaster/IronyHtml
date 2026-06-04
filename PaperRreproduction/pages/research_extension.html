@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>博士論文延伸設計</title><link rel="stylesheet" href="../assets/style.css"><script src="../assets/app.js"></script></head><body><div class="layout">
+    <div class="sidebar">
+      <div class="brand">多模態反諷辨識<br>三篇論文重現教學</div>
+      <div class="subtitle">Castro 2019 · Gao 2025 · Yue 2024<br>資料來源、模型、流程圖、程式碼</div>
+      <div class="nav">
+        <a href="../index.html">首頁：總覽</a>
+        <a href="../pages/paper_summaries.html">論文原文連結與重點</a>
+        <a href="../pages/setup.html">環境與硬體配備</a>
+        <a href="../pages/data_links.html">資料來源與網站</a>
+        <a href="../pages/models.html">開源模型與使用方法</a>
+        <a href="../pages/mustard.html">Castro 2019：MUStARD</a>
+        <a href="../pages/mcsd.html">Gao 2025：MCSD</a>
+        <a href="../pages/sarcnet.html">Yue 2024：SarcNet</a>
+        <a href="../pages/code_guide.html">程式碼與變數函式說明</a>
+        <a href="../pages/research_extension.html">博士論文延伸設計</a>
+      </div>
+    </div><main class="content"><section class="hero"><h1>博士論文延伸設計</h1><p>完成三篇 paper baseline 重現後，可以往華語多模態反諷辨識與隱喻—反諷交互關係發展。</p></section><h2>一、從重現到創新</h2><table class="table"><tr><th>原始重現</th><th>博士論文延伸</th></tr><tr><td>BERT / Wav2Vec2 / TimeSformer → concat → SVM</td><td>加入 cross-modal attention、gated fusion 或 multimodal transformer。</td></tr><tr><td>單一反諷標籤</td><td>新增文字、語音、視覺、語境、整體反諷與隱喻交互標籤。</td></tr><tr><td>只看分類效能</td><td>加入可解釋性分析、錯誤案例分析、模態貢獻分析。</td></tr></table><h2>二、建議新增標註欄位</h2><div class="grid"><div class="card"><h3>反諷標註</h3><p>是否反諷、反諷強度、反諷是否需語境判斷。</p></div><div class="card"><h3>語境特徵</h3><p>前文是否形成期待、語意是否反轉、說話者意圖是否與字面相反。</p></div><div class="card"><h3>隱喻交互</h3><p>是否含隱喻、隱喻來源域/目標域、語境是否反轉隱喻評價。</p></div></div><h2>三、建議博士實驗</h2><details open><summary>實驗一：單模態 baseline</summary><div><p>比較文字、語音、視覺各自的反諷辨識效果。</p></div></details><details><summary>實驗二：多模態融合</summary><div><p>比較 T+A、T+V、A+V、T+A+V；並做 ablation study。</p></div></details><details><summary>實驗三：語境與隱喻交互</summary><div><p>加入語境特徵與隱喻標註後，比較模型是否能更準確辨識反諷。</p></div></details><div class="footer">本教學網站由 ChatGPT 依據使用者博士論文研究方向整理。資料集與模型請依各官方網站授權條款使用；本 ZIP 不包含原始資料集本體。</div></main></div></body></html>

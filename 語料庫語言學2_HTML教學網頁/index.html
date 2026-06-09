@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>從語料分析到智慧應用：語料庫語言學 HTML 教學網頁</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#ffffff;--text:#14213d;--muted:#5f6c7b;--accent:#0f766e;--accent2:#2563eb;--border:#d8e0ea;--shadow:0 12px 35px rgba(15,23,42,.10);--code:#eff6ff;}
+[data-theme="dark"]{--bg:#07111f;--panel:#101827;--text:#e5edf7;--muted:#a8b3c2;--accent:#2dd4bf;--accent2:#60a5fa;--border:#263244;--shadow:0 12px 35px rgba(0,0,0,.35);--code:#111c2e;}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.85;}
+.hero{padding:48px 6vw 32px;background:linear-gradient(135deg,#0f172a,#0f766e 55%,#1d4ed8);color:white;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.12)}
+.hero h1{margin:0;font-size:clamp(28px,4vw,54px);letter-spacing:.04em;line-height:1.25} .hero p{max-width:950px;font-size:18px;opacity:.95}
+.toolbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--panel) 92%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:12px 6vw;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.search{flex:1;min-width:260px;padding:12px 16px;border:1px solid var(--border);border-radius:999px;background:var(--panel);color:var(--text);font-size:16px}
+.btn{border:1px solid var(--border);background:var(--panel);color:var(--text);padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:700}
+main{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;padding:28px 6vw 70px}
+.toc{position:sticky;top:82px;align-self:start;background:var(--panel);border:1px solid var(--border);box-shadow:var(--shadow);border-radius:22px;padding:18px;max-height:calc(100vh - 110px);overflow:auto}
+.toc h2{font-size:18px;margin:0 0 12px} .toc a{display:flex;gap:10px;text-decoration:none;color:var(--text);padding:8px 6px;border-radius:10px;line-height:1.35;font-size:14px}
+.toc a:hover{background:var(--code)} .toc span{color:var(--accent2);font-weight:800}
+.slide-card{background:var(--panel);border:1px solid var(--border);border-radius:22px;margin:0 0 18px;box-shadow:var(--shadow);overflow:hidden}
+.slide-card summary{list-style:none;cursor:pointer;padding:18px 22px;display:flex;align-items:center;gap:14px;border-bottom:1px solid transparent}
+.slide-card[open] summary{border-bottom-color:var(--border)} summary::-webkit-details-marker{display:none} .badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:999px;padding:5px 12px;font-weight:800;white-space:nowrap}
+.hint{margin-left:auto;color:var(--muted);font-size:14px} .slide-body{padding:22px} figure{margin:0 0 24px;background:var(--code);border:1px solid var(--border);border-radius:18px;padding:14px;text-align:center}
+figure img{max-width:100%;height:auto;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.18);background:white} figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+.explain-section{display:grid;gap:14px} .explain-section h4{margin:8px 0 0;color:var(--accent);font-size:20px} .explain-section p{margin:0;background:color-mix(in srgb,var(--panel) 70%,var(--code));border-left:4px solid var(--accent);padding:12px 14px;border-radius:12px}
+.hidden{display:none!important} #topBtn{position:fixed;right:24px;bottom:24px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;border-radius:999px;padding:14px 16px;font-weight:900;box-shadow:var(--shadow);cursor:pointer}
+.footer{padding:28px 6vw;color:var(--muted);text-align:center;border-top:1px solid var(--border)}
+@media(max-width:980px){main{grid-template-columns:1fr}.toc{position:relative;top:auto;max-height:none}.hint{display:none}}
+</style>
+</head>
+<body>
+<header class="hero" id="top">
+  <h1>從語料分析到智慧應用：語料庫語言學的跨域實踐</h1>
+  <p>本教學網頁依照原始 PDF 投影片逐頁製作，每一張投影片對應一個下拉式介面，保留原始投影片圖片，並加入至少 300 字以上的繁體中文教學講解，適合課堂講授、學生自學與課後複習。</p>
+</header>
+<nav class="toolbar">
+  <input id="search" class="search" placeholder="搜尋投影片標題或講解內容，例如：NER、詞頻、CKIP、美食推薦…">
+  <button class="btn" onclick="openAll()">全部展開</button>
+  <button class="btn" onclick="closeAll()">全部收合</button>
+  <button class="btn" onclick="toggleTheme()">深色／淺色</button>
+</nav>
+<main>
+  <aside class="toc"><h2>目錄</h2><a href="#slide-1"><span>01</span>課程總覽：從語料分析到智慧應用</a>
+<a href="#slide-2"><span>02</span>CrawlerMagic WebBase 平台介紹</a>
+<a href="#slide-3"><span>03</span>數位與人文的對話：資料、資訊、知識、商品</a>
+<a href="#slide-4"><span>04</span>爬蟲系統開發</a>
+<a href="#slide-5"><span>05</span>CrawlerMagic / WebBase 操作流程</a>
+<a href="#slide-6"><span>06</span>收集資料：從真實世界取得語料</a>
+<a href="#slide-7"><span>07</span>CrawlerMagic WebBase 資料來源介面</a>
+<a href="#slide-8"><span>08</span>爬蟲過程與資料擷取</a>
+<a href="#slide-9"><span>09</span>爬取資料的數位典藏</a>
+<a href="#slide-10"><span>10</span>斷詞／POS／NER 的語料分析流程</a>
+<a href="#slide-11"><span>11</span>WebBase 斷詞結果與視覺化</a>
+<a href="#slide-12"><span>12</span>POS 與 NER 是什麼</a>
+<a href="#slide-13"><span>13</span>CrawlerMagic WebBase POS 詞性標註</a>
+<a href="#slide-14"><span>14</span>CrawlerMagic WebBase NER 命名實體辨識</a>
+<a href="#slide-15"><span>15</span>POS 與 NER 的相似性與差異性</a>
+<a href="#slide-16"><span>16</span>NER：找出文本中的人、事、時、地、物</a>
+<a href="#slide-17"><span>17</span>中文斷詞模型與分析模式比較</a>
+<a href="#slide-18"><span>18</span>中文斷詞工具與模型比較表</a>
+<a href="#slide-19"><span>19</span>中文斷詞工具功能比較表</a>
+<a href="#slide-20"><span>20</span>模型來源與參考文獻資料</a>
+<a href="#slide-21"><span>21</span>CrawlerMagic WebBase 詞頻分析</a>
+<a href="#slide-22"><span>22</span>詞頻與文字雲視覺化</a>
+<a href="#slide-23"><span>23</span>關鍵詞與 TF-IDF 的概念</a>
+<a href="#slide-24"><span>24</span>文章摘要與句子重要性</a>
+<a href="#slide-25"><span>25</span>語料分析成果彙整</a>
+<a href="#slide-26"><span>26</span>將爬到資料做數位典藏</a>
+<a href="#slide-27"><span>27</span>Excel 語料分析成果說明</a>
+<a href="#slide-28"><span>28</span>美食語料特徵擷取與人工分類</a>
+<a href="#slide-29"><span>29</span>美食特徵到知識模型</a>
+<a href="#slide-30"><span>30</span>台灣美食推薦系統：詞性實作應用</a>
+<a href="#slide-31"><span>31</span>美食特徵手動分類與標記</a>
+<a href="#slide-32"><span>32</span>機器學習與 Scikit-learn</a>
+<a href="#slide-33"><span>33</span>模型產生：決策樹</a>
+<a href="#slide-34"><span>34</span>SVM 支援向量機與參數 C</a>
+<a href="#slide-35"><span>35</span>RecoFood Web Demo 與課程總結</a></aside>
+  <section>
+<details class="slide-card" id="slide-1" data-title="課程總覽：從語料分析到智慧應用" data-text="1 http://gong.imetaphor.tw https://recofood-render.onrender.com/ 從語料分析到智慧應用：語料庫語言學的跨域實踐">
+  <summary><span class="badge">Slide 01</span><strong>課程總覽：從語料分析到智慧應用</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_001.png" alt="第 1 頁投影片圖片"><figcaption>第 1 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「課程總覽：從語料分析到智慧應用」，核心關鍵包含：語料庫語言學、智慧應用、CrawlerMagic、RecoFood。投影片中的文字或畫面重點為：1 http://gong.imetaphor.tw https://recofood-render.onrender.com/ 從語料分析到智慧應用：語料庫語言學的跨域實踐。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-2" data-title="CrawlerMagic WebBase 平台介紹" data-text="CrawlerMagic WebBase 是一套結合網頁爬蟲與自然語言處理技術的 智慧分析平台，能夠自動擷取新聞網站、PTT、Wikipedia 與其他公 開網頁內容，快速建立研究所需的文字語料庫，大幅降低人工蒐集 與整理資料的時間成本。 系統內建中文斷詞、詞性標註（POS）與命名實體辨識（NER）功 能，並支援jieba、CKIP 與HanLP 等多種語言分析工具。使用者可 進一步進行詞頻統計、關鍵詞擷取、搭配詞分析、摘要生成及文字 雲視覺化，深入探索文本中的語言特徵與語意資訊。 除了語料分析之外，CrawlerMagic WebBase 亦提供Excel、CSV 與 分析報表輸出功能，可作為生成式AI、自然語言處理、大數據分析 及數位人文研究的重要工具。從資料收集、資料清理、語言分析到 AI 應用，皆可在同一平台完成，適用於教學、研究與實務應用等多 種情境。 CrawlerMagic WebBase">
+  <summary><span class="badge">Slide 02</span><strong>CrawlerMagic WebBase 平台介紹</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_002.png" alt="第 2 頁投影片圖片"><figcaption>第 2 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic WebBase 平台介紹」，核心關鍵包含：網頁爬蟲、中文斷詞、POS、NER、報表輸出。投影片中的文字或畫面重點為：CrawlerMagic WebBase 是一套結合網頁爬蟲與自然語言處理技術的 智慧分析平台，能夠自動擷取新聞網站、PTT、Wikipedia 與其他公 開網頁內容，快速建立研究所需的文字語料庫，大幅降低人工蒐集 與整理資料的時間成本。 系統內建中文斷詞、詞性標註（POS）與命名實體辨識（NER）功 能，並支援jieba、CKIP 與HanLP 等多種語言分析工具。使用者可 進一步進行詞頻統計、關鍵詞擷取、搭配詞分析、摘要生成及文……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-3" data-title="數位與人文的對話：資料、資訊、知識、商品" data-text="">
+  <summary><span class="badge">Slide 03</span><strong>數位與人文的對話：資料、資訊、知識、商品</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_003.png" alt="第 3 頁投影片圖片"><figcaption>第 3 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「數位與人文的對話：資料、資訊、知識、商品」，核心關鍵包含：數位人文、資料、資訊、知識、商品。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-4" data-title="爬蟲系統開發" data-text="爬蟲系統開發">
+  <summary><span class="badge">Slide 04</span><strong>爬蟲系統開發</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_004.png" alt="第 4 頁投影片圖片"><figcaption>第 4 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「爬蟲系統開發」，核心關鍵包含：爬蟲、網頁資料、文本擷取、程式流程。投影片中的文字或畫面重點為：爬蟲系統開發。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-5" data-title="CrawlerMagic / WebBase 操作流程" data-text="CrawlerMagic / WebBase操作流程 把線上文章轉成可處理的語料文本 Corpus Linguistics × NLP × AI 5">
+  <summary><span class="badge">Slide 05</span><strong>CrawlerMagic / WebBase 操作流程</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_005.png" alt="第 5 頁投影片圖片"><figcaption>第 5 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic / WebBase 操作流程」，核心關鍵包含：收集資料、清理資料、斷詞、詞頻、AI應用。投影片中的文字或畫面重點為：CrawlerMagic / WebBase操作流程 把線上文章轉成可處理的語料文本 Corpus Linguistics × NLP × AI 5。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-6" data-title="收集資料：從真實世界取得語料" data-text="二、收集資料：從真實世界取得語料 讓學生理解：語料庫的第一步不是分析，而是資料來源設計 UDN 新聞 PTT / 社群 iCook 美食 Wikipedia 學生自建文本 教學動作：先讓學生選定研究問題，再選資料來源。 例：研究美食描述詞→ iCook / Google 評論/ 美食 部落格。 例：研究公共議題語言→ 新聞/ 社群留言。 提醒：資料來源會影響後續分析結果。 Corpus Linguistics × NLP × AI 6">
+  <summary><span class="badge">Slide 06</span><strong>收集資料：從真實世界取得語料</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_006.png" alt="第 6 頁投影片圖片"><figcaption>第 6 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「收集資料：從真實世界取得語料」，核心關鍵包含：資料來源、研究問題、UDN、PTT、iCook、Wikipedia。投影片中的文字或畫面重點為：二、收集資料：從真實世界取得語料 讓學生理解：語料庫的第一步不是分析，而是資料來源設計 UDN 新聞 PTT / 社群 iCook 美食 Wikipedia 學生自建文本 教學動作：先讓學生選定研究問題，再選資料來源。 例：研究美食描述詞→ iCook / Google 評論/ 美食 部落格。 例：研究公共議題語言→ 新聞/ 社群留言。 提醒：資料來源會影響後續分析結果。 Corpus Linguistics × NLP × AI 6。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-7" data-title="CrawlerMagic WebBase 資料來源介面" data-text="http://gong.imetaphor.tw CrawlerMagic WebBase UDN 新聞 PTT / 社群 iCook 美食 Wikipedia">
+  <summary><span class="badge">Slide 07</span><strong>CrawlerMagic WebBase 資料來源介面</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_007.png" alt="第 7 頁投影片圖片"><figcaption>第 7 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic WebBase 資料來源介面」，核心關鍵包含：平台操作、網址輸入、資料來源、自動分析。投影片中的文字或畫面重點為：http://gong.imetaphor.tw CrawlerMagic WebBase UDN 新聞 PTT / 社群 iCook 美食 Wikipedia。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-8" data-title="爬蟲過程與資料擷取" data-text="CrawlerMagic WebBase_爬蟲過程與資料">
+  <summary><span class="badge">Slide 08</span><strong>爬蟲過程與資料擷取</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_008.png" alt="第 8 頁投影片圖片"><figcaption>第 8 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「爬蟲過程與資料擷取」，核心關鍵包含：爬蟲過程、原始文本、分析結果、資料檢查。投影片中的文字或畫面重點為：CrawlerMagic WebBase_爬蟲過程與資料。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-9" data-title="爬取資料的數位典藏" data-text="CrawlerMagic WebBase_將爬到了資料做數位典藏">
+  <summary><span class="badge">Slide 09</span><strong>爬取資料的數位典藏</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_009.png" alt="第 9 頁投影片圖片"><figcaption>第 9 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「爬取資料的數位典藏」，核心關鍵包含：數位典藏、Excel、CSV、語料保存。投影片中的文字或畫面重點為：CrawlerMagic WebBase_將爬到了資料做數位典藏。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-10" data-title="斷詞／POS／NER 的語料分析流程" data-text="收集資料 清理資料 斷詞/POS/NER 詞頻/關鍵詞/搭配 詞 語言學解釋 AI應用 Corpus Linguistics × NLP × AI 10 CrawlerMagic WebBase_斷詞/POS/NER">
+  <summary><span class="badge">Slide 10</span><strong>斷詞／POS／NER 的語料分析流程</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_010.png" alt="第 10 頁投影片圖片"><figcaption>第 10 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「斷詞／POS／NER 的語料分析流程」，核心關鍵包含：斷詞、詞性標註、命名實體辨識、流程。投影片中的文字或畫面重點為：收集資料 清理資料 斷詞/POS/NER 詞頻/關鍵詞/搭配 詞 語言學解釋 AI應用 Corpus Linguistics × NLP × AI 10 CrawlerMagic WebBase_斷詞/POS/NER。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-11" data-title="WebBase 斷詞結果與視覺化" data-text="http://gong.imetaphor.tw CrawlerMagic WebBase_斷詞/POS/NER">
+  <summary><span class="badge">Slide 11</span><strong>WebBase 斷詞結果與視覺化</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_011.png" alt="第 11 頁投影片圖片"><figcaption>第 11 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「WebBase 斷詞結果與視覺化」，核心關鍵包含：Token、視覺化、斷詞結果、比較分析。投影片中的文字或畫面重點為：http://gong.imetaphor.tw CrawlerMagic WebBase_斷詞/POS/NER。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-12" data-title="POS 與 NER 是什麼" data-text="Corpus Linguistics × NLP × AI 12 CrawlerMagic WebBase_斷詞/POS/NER">
+  <summary><span class="badge">Slide 12</span><strong>POS 與 NER 是什麼</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_012.png" alt="第 12 頁投影片圖片"><figcaption>第 12 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「POS 與 NER 是什麼」，核心關鍵包含：POS、NER、詞性、實體類別。投影片中的文字或畫面重點為：Corpus Linguistics × NLP × AI 12 CrawlerMagic WebBase_斷詞/POS/NER。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-13" data-title="CrawlerMagic WebBase POS 詞性標註" data-text="CrawlerMagic WebBase_POS">
+  <summary><span class="badge">Slide 13</span><strong>CrawlerMagic WebBase POS 詞性標註</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_013.png" alt="第 13 頁投影片圖片"><figcaption>第 13 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic WebBase POS 詞性標註」，核心關鍵包含：詞性標註、名詞、動詞、語法功能。投影片中的文字或畫面重點為：CrawlerMagic WebBase_POS。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-14" data-title="CrawlerMagic WebBase NER 命名實體辨識" data-text="CrawlerMagic WebBase_NER">
+  <summary><span class="badge">Slide 14</span><strong>CrawlerMagic WebBase NER 命名實體辨識</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_014.png" alt="第 14 頁投影片圖片"><figcaption>第 14 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic WebBase NER 命名實體辨識」，核心關鍵包含：命名實體、日期、地點、組織、數量。投影片中的文字或畫面重點為：CrawlerMagic WebBase_NER。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-15" data-title="POS 與 NER 的相似性與差異性" data-text="">
+  <summary><span class="badge">Slide 15</span><strong>POS 與 NER 的相似性與差異性</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_015.png" alt="第 15 頁投影片圖片"><figcaption>第 15 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「POS 與 NER 的相似性與差異性」，核心關鍵包含：POS與NER、語法、語意、互補性。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-16" data-title="NER：找出文本中的人、事、時、地、物" data-text="命名實體辨識NER：找出文本中的「人事時地物」 NER 是從非結構化文本抽取知識的重要步驟 蔡英文今天到台南參加活動 蔡英文 PERSON 今天 DATE 台南 GPE 語言學用途：觀察誰被提到、在哪裡、何時、與哪些事件 相關 AI用途：摘要、搜尋、問答、推薦、知識圖譜 課堂延伸：美食語料可自訂菜名、食材、作法、口感等領 域標籤 Corpus Linguistics × NLP × AI 16">
+  <summary><span class="badge">Slide 16</span><strong>NER：找出文本中的人、事、時、地、物</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_016.png" alt="第 16 頁投影片圖片"><figcaption>第 16 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「NER：找出文本中的人、事、時、地、物」，核心關鍵包含：人事時地物、PERSON、DATE、GPE、知識圖譜。投影片中的文字或畫面重點為：命名實體辨識NER：找出文本中的「人事時地物」 NER 是從非結構化文本抽取知識的重要步驟 蔡英文今天到台南參加活動 蔡英文 PERSON 今天 DATE 台南 GPE 語言學用途：觀察誰被提到、在哪裡、何時、與哪些事件 相關 AI用途：摘要、搜尋、問答、推薦、知識圖譜 課堂延伸：美食語料可自訂菜名、食材、作法、口感等領 域標籤 Corpus Linguistics × NLP × AI 16。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-17" data-title="中文斷詞模型與分析模式比較" data-text="中文斷詞模型與分析模式比較 本系統整合CKIP、HanLP 與jieba 三種中文自然語言處理工具。 CKIP 支援斷詞、詞性標註（POS）與命名實體辨識（NER），適合正式語料分析； HanLP 提供粗粒度、細粒度與多任務模式，可觀察不同層次的語言結構； jieba 則以高速斷詞與詞頻統計見長，適合快速分析與文字雲應用。使用者可依研究目的選擇不同模型， 比較斷詞結果與語言分析差異。 https://colab.research.google.com/drive/1NOdbxoAPhNSWWTZZRFqI25JYTuQqee04?usp=sharing">
+  <summary><span class="badge">Slide 17</span><strong>中文斷詞模型與分析模式比較</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_017.png" alt="第 17 頁投影片圖片"><figcaption>第 17 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「中文斷詞模型與分析模式比較」，核心關鍵包含：CKIP、HanLP、jieba、模型比較。投影片中的文字或畫面重點為：中文斷詞模型與分析模式比較 本系統整合CKIP、HanLP 與jieba 三種中文自然語言處理工具。 CKIP 支援斷詞、詞性標註（POS）與命名實體辨識（NER），適合正式語料分析； HanLP 提供粗粒度、細粒度與多任務模式，可觀察不同層次的語言結構； jieba 則以高速斷詞與詞頻統計見長，適合快速分析與文字雲應用。使用者可依研究目的選擇不同模型， 比較斷詞結果與語言分析差異。 https://colab.research.……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-18" data-title="中文斷詞工具與模型比較表" data-text="">
+  <summary><span class="badge">Slide 18</span><strong>中文斷詞工具與模型比較表</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_018.png" alt="第 18 頁投影片圖片"><figcaption>第 18 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「中文斷詞工具與模型比較表」，核心關鍵包含：bert-base、albert、粗粒度、細粒度、HMM。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-19" data-title="中文斷詞工具功能比較表" data-text="">
+  <summary><span class="badge">Slide 19</span><strong>中文斷詞工具功能比較表</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_019.png" alt="第 19 頁投影片圖片"><figcaption>第 19 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「中文斷詞工具功能比較表」，核心關鍵包含：WS、POS、NER、速度、學術應用。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-20" data-title="模型來源與參考文獻資料" data-text="模型來源與參考文獻資料 CKIP Transformers 官方文件 CKIP Transformers GitHub BERT Paper (arXiv) BERT Paper PDF HanLP 官方網站 HanLP References The Stem Cell Hypothesis (ACL) The Stem Cell Hypothesis PDF The Stem Cell Hypothesis (arXiv) The Stem Cell Hypothesis PDF (arXiv) jieba GitHub jieba PyPI">
+  <summary><span class="badge">Slide 20</span><strong>模型來源與參考文獻資料</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_020.png" alt="第 20 頁投影片圖片"><figcaption>第 20 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「模型來源與參考文獻資料」，核心關鍵包含：參考文獻、BERT、HanLP、jieba、CKIP。投影片中的文字或畫面重點為：模型來源與參考文獻資料 CKIP Transformers 官方文件 CKIP Transformers GitHub BERT Paper (arXiv) BERT Paper PDF HanLP 官方網站 HanLP References The Stem Cell Hypothesis (ACL) The Stem Cell Hypothesis PDF The Stem Cell Hypothesis (arXiv) The S……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-21" data-title="CrawlerMagic WebBase 詞頻分析" data-text="CrawlerMagic WebBase_頻詞">
+  <summary><span class="badge">Slide 21</span><strong>CrawlerMagic WebBase 詞頻分析</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_021.png" alt="第 21 頁投影片圖片"><figcaption>第 21 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「CrawlerMagic WebBase 詞頻分析」，核心關鍵包含：詞頻、高頻詞、語料統計、初步觀察。投影片中的文字或畫面重點為：CrawlerMagic WebBase_頻詞。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-22" data-title="詞頻與文字雲視覺化" data-text="">
+  <summary><span class="badge">Slide 22</span><strong>詞頻與文字雲視覺化</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_022.png" alt="第 22 頁投影片圖片"><figcaption>第 22 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「詞頻與文字雲視覺化」，核心關鍵包含：文字雲、視覺化、關鍵字、頻率。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-23" data-title="關鍵詞與 TF-IDF 的概念" data-text="關鍵詞可能性 詞語 詞頻 其他文章常見嗎 關鍵詞可能性 的 80 很常見 低 學生 30 常見 中 雙語教學 15 較少見 高 生成式AI 12 較少見 高 TF-IDF 步驟 做法 目的 1、斷詞 把文章切成詞 取得可統計的詞語 2、去停用詞 刪掉「的、了、是、在」 移除無意義高頻詞 3、算詞頻 統計每個詞出現幾次 找出常出現的詞 4、算TF-IDF 比較本篇與其他文章 找出有代表性的詞 5、人工檢查 看是否符合主題 避免錯誤或無意義詞 關鍵詞怎麼求得? TF-IDF 不是看「大於多少」就一定是關鍵詞，而是通常看排名。">
+  <summary><span class="badge">Slide 23</span><strong>關鍵詞與 TF-IDF 的概念</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_023.png" alt="第 23 頁投影片圖片"><figcaption>第 23 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「關鍵詞與 TF-IDF 的概念」，核心關鍵包含：TF-IDF、停用詞、關鍵詞、代表性。投影片中的文字或畫面重點為：關鍵詞可能性 詞語 詞頻 其他文章常見嗎 關鍵詞可能性 的 80 很常見 低 學生 30 常見 中 雙語教學 15 較少見 高 生成式AI 12 較少見 高 TF-IDF 步驟 做法 目的 1、斷詞 把文章切成詞 取得可統計的詞語 2、去停用詞 刪掉「的、了、是、在」 移除無意義高頻詞 3、算詞頻 統計每個詞出現幾次 找出常出現的詞 4、算TF-IDF 比較本篇與其他文章 找出有代表性的詞 5、人工檢查 看是否符合主題 避免錯誤或無意義……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-24" data-title="文章摘要與句子重要性" data-text="文章摘要 系統利用詞頻統計評估每個句子的重要性，選出分數最高的句子組成文章摘要。">
+  <summary><span class="badge">Slide 24</span><strong>文章摘要與句子重要性</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_024.png" alt="第 24 頁投影片圖片"><figcaption>第 24 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「文章摘要與句子重要性」，核心關鍵包含：摘要、句子分數、重要句、快速理解。投影片中的文字或畫面重點為：文章摘要 系統利用詞頻統計評估每個句子的重要性，選出分數最高的句子組成文章摘要。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-25" data-title="語料分析成果彙整" data-text="">
+  <summary><span class="badge">Slide 25</span><strong>語料分析成果彙整</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_025.png" alt="第 25 頁投影片圖片"><figcaption>第 25 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「語料分析成果彙整」，核心關鍵包含：分析成果、語言特徵、資料詮釋、報告。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-26" data-title="將爬到資料做數位典藏" data-text="CrawlerMagic WebBase_將爬到了資料做數位典藏">
+  <summary><span class="badge">Slide 26</span><strong>將爬到資料做數位典藏</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_026.png" alt="第 26 頁投影片圖片"><figcaption>第 26 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「將爬到資料做數位典藏」，核心關鍵包含：數位典藏、檔案管理、可重現研究、保存。投影片中的文字或畫面重點為：CrawlerMagic WebBase_將爬到了資料做數位典藏。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-27" data-title="Excel 語料分析成果說明" data-text="這個Excel 檔案代表的是CrawlerMagic WebBase 對一篇真實網頁食 譜文章進行自然語言處理後的完整分析成果。它不是單純的資料表，而 是把原始網頁文字轉換成可檢查、可統計、可教學使用的語料分析結果。 檔案中包含原文、斷詞結果、Token 視覺化、詞性標註、命名實體辨 識、摘要、詞頻統計、POS 統計與NER 統計等工作表。這表示系統已完 成從「網頁文字」到「結構化語言資料」的轉換，學生可以清楚看到 NLP 每一個處理步驟的產出。 這個檔案的重點在於展示：中文文本經過斷詞、POS、NER 與詞頻統 計後，可以被整理成適合研究與教學的資料格式。同時，Excel 也能讓使 用者檢查系統分析是否正確，例如斷詞是否合理、詞性是否準確、NER 是否有誤判，進一步理解自然語言處理並非只看結果，也需要人工檢核 與語言學判斷。 Excel 檔案所代表的意義">
+  <summary><span class="badge">Slide 27</span><strong>Excel 語料分析成果說明</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_027.png" alt="第 27 頁投影片圖片"><figcaption>第 27 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「Excel 語料分析成果說明」，核心關鍵包含：Excel工作表、Token、POS統計、NER統計。投影片中的文字或畫面重點為：這個Excel 檔案代表的是CrawlerMagic WebBase 對一篇真實網頁食 譜文章進行自然語言處理後的完整分析成果。它不是單純的資料表，而 是把原始網頁文字轉換成可檢查、可統計、可教學使用的語料分析結果。 檔案中包含原文、斷詞結果、Token 視覺化、詞性標註、命名實體辨 識、摘要、詞頻統計、POS 統計與NER 統計等工作表。這表示系統已完 成從「網頁文字」到「結構化語言資料」的轉換，學生可以清楚看到 NLP 每一個處理步……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-28" data-title="美食語料特徵擷取與人工分類" data-text="詞語 詞性判斷 詞頻判斷 人工分類 番茄 名詞 高 食材 洋蔥 名詞 中 食材 香菜 名詞 中 食材 檸檬汁 名詞 中 食材／調味料 橄欖油 名詞 中 食材／調味料 義大利麵 名詞 高 食材 鹽 名詞 低 調味料 糖 名詞 低 調味料 黑胡椒粒 名詞 低 調味料 酸香 形容詞 中 味道 清爽 形容詞 中 味道／口感 切碎 動詞 中 煮法／處理方式 拌均勻 動詞 中 煮法／處理方式 水煮 動詞 低 煮法 冰鎮 動詞 低 煮法／處理方式 台灣美食推薦系統_美食斷詞流程實作 找出美食相關詞">
+  <summary><span class="badge">Slide 28</span><strong>美食語料特徵擷取與人工分類</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_028.png" alt="第 28 頁投影片圖片"><figcaption>第 28 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「美食語料特徵擷取與人工分類」，核心關鍵包含：食材、味道、煮法、特徵擷取、人工分類。投影片中的文字或畫面重點為：詞語 詞性判斷 詞頻判斷 人工分類 番茄 名詞 高 食材 洋蔥 名詞 中 食材 香菜 名詞 中 食材 檸檬汁 名詞 中 食材／調味料 橄欖油 名詞 中 食材／調味料 義大利麵 名詞 高 食材 鹽 名詞 低 調味料 糖 名詞 低 調味料 黑胡椒粒 名詞 低 調味料 酸香 形容詞 中 味道 清爽 形容詞 中 味道／口感 切碎 動詞 中 煮法／處理方式 拌均勻 動詞 中 煮法／處理方式 水煮 動詞 低 煮法 冰鎮 動詞 低 煮法／處理方式 台……。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-29" data-title="美食特徵到知識模型" data-text="">
+  <summary><span class="badge">Slide 29</span><strong>美食特徵到知識模型</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_029.png" alt="第 29 頁投影片圖片"><figcaption>第 29 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「美食特徵到知識模型」，核心關鍵包含：特徵、知識模型、推薦系統、AI訓練。投影片中的文字或畫面重點為：本頁主要以圖像、表格或系統截圖呈現教學內容，重點在於讓學生從視覺化畫面理解操作流程與分析結果。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-30" data-title="台灣美食推薦系統：詞性實作應用" data-text="台灣美食推薦系統_美食斷詞流程實作 詞性實作應用 食材、味道、煮法">
+  <summary><span class="badge">Slide 30</span><strong>台灣美食推薦系統：詞性實作應用</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_030.png" alt="第 30 頁投影片圖片"><figcaption>第 30 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「台灣美食推薦系統：詞性實作應用」，核心關鍵包含：美食斷詞、詞性應用、食材味道煮法、實作。投影片中的文字或畫面重點為：台灣美食推薦系統_美食斷詞流程實作 詞性實作應用 食材、味道、煮法。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-31" data-title="美食特徵手動分類與標記" data-text="美食特徵手動分類與標記 將美食文本中的食材、味道與烹調特徵進行人工標註，轉換成0/1 結構化資料，作為後續機器 學習與AI 分析的訓練資料集。">
+  <summary><span class="badge">Slide 31</span><strong>美食特徵手動分類與標記</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_031.png" alt="第 31 頁投影片圖片"><figcaption>第 31 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「美食特徵手動分類與標記」，核心關鍵包含：0/1標記、訓練資料集、人工標註、機器學習。投影片中的文字或畫面重點為：美食特徵手動分類與標記 將美食文本中的食材、味道與烹調特徵進行人工標註，轉換成0/1 結構化資料，作為後續機器 學習與AI 分析的訓練資料集。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-32" data-title="機器學習與 Scikit-learn" data-text="機器學習_ SKlearn • SKlearn在python中提供大量常見的機器學習演算法和許 多實用的資料集合，像是Iris以及手寫辨識數字的資料。而 演算法的部分，可以在SKlearn官網中看到，他將功能分為 6個部分：Classification、Regression、Clustering、 Model selection、Preprocessing、Dimensionality reduction，各個適合的演算法。">
+  <summary><span class="badge">Slide 32</span><strong>機器學習與 Scikit-learn</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_032.png" alt="第 32 頁投影片圖片"><figcaption>第 32 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「機器學習與 Scikit-learn」，核心關鍵包含：SKlearn、分類、迴歸、模型選擇、前處理。投影片中的文字或畫面重點為：機器學習_ SKlearn • SKlearn在python中提供大量常見的機器學習演算法和許 多實用的資料集合，像是Iris以及手寫辨識數字的資料。而 演算法的部分，可以在SKlearn官網中看到，他將功能分為 6個部分：Classification、Regression、Clustering、 Model selection、Preprocessing、Dimensionality reduction，各個適合的演算法。。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-33" data-title="模型產生：決策樹" data-text="模型產生_決策樹">
+  <summary><span class="badge">Slide 33</span><strong>模型產生：決策樹</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_033.png" alt="第 33 頁投影片圖片"><figcaption>第 33 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「模型產生：決策樹」，核心關鍵包含：決策樹、特徵判斷、分類規則、可解釋性。投影片中的文字或畫面重點為：模型產生_決策樹。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-34" data-title="SVM 支援向量機與參數 C" data-text="針對C 的不同(0.01, 0.1, 1, 10, 100) 做分 類，其結果如下表所示從結果可得知C 設 的越小，其準確率則會變低，是因為C 設 的越小，SVM 則會嘗試找出具有越大 margin 的hyperplane，導致有些資料會 被錯分 SVM(Support Vector Machine)">
+  <summary><span class="badge">Slide 34</span><strong>SVM 支援向量機與參數 C</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_034.png" alt="第 34 頁投影片圖片"><figcaption>第 34 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「SVM 支援向量機與參數 C」，核心關鍵包含：SVM、C參數、margin、分類邊界。投影片中的文字或畫面重點為：針對C 的不同(0.01, 0.1, 1, 10, 100) 做分 類，其結果如下表所示從結果可得知C 設 的越小，其準確率則會變低，是因為C 設 的越小，SVM 則會嘗試找出具有越大 margin 的hyperplane，導致有些資料會 被錯分 SVM(Support Vector Machine)。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+
+
+<details class="slide-card" id="slide-35" data-title="RecoFood Web Demo 與課程總結" data-text="Demo https://recofood-render.onrender.com/">
+  <summary><span class="badge">Slide 35</span><strong>RecoFood Web Demo 與課程總結</strong><span class="hint">點擊展開／收合</span></summary>
+  <div class="slide-body">
+    <figure><img src="slides/slide_035.png" alt="第 35 頁投影片圖片"><figcaption>第 35 頁原始投影片截圖</figcaption></figure>
+    
+<div class="explain-section">
+  <h4>（1）本頁重點</h4>
+  <p>本頁主題是「RecoFood Web Demo 與課程總結」，核心關鍵包含：Demo、RecoFood、推薦結果、課程應用。投影片中的文字或畫面重點為：Demo https://recofood-render.onrender.com/。這一頁不是單純展示工具，而是把語料庫語言學的研究流程放進可操作的數位環境中，讓學生理解從原始文本到可分析資料之間需要經過哪些轉換。</p>
+  <h4>（2）核心概念說明</h4>
+  <p>在語料庫語言學與自然語言處理課程中，最重要的是讓學生知道「文本」不會自動變成「知識」。原始網頁、新聞、食譜或社群留言，必須先被收集、清理、斷詞、標註與統計，才可能進一步被解釋或作為 AI 模型的輸入。本頁可用來說明資料處理的層次：第一層是取得資料，第二層是整理成語料，第三層是透過斷詞、POS、NER、詞頻與關鍵詞分析抽取語言特徵，第四層才是推薦系統、摘要、搜尋或知識模型等智慧應用。</p>
+  <h4>（3）適合上課時怎麼講</h4>
+  <p>上課時可以先請學生觀察投影片中的標題、截圖、表格或流程箭頭，再問學生：這一頁位於整個流程的哪一個階段？它處理的是資料收集、資料清理、語言分析，還是 AI 應用？接著用一個具體例子串起來，例如把一篇 iCook 食譜放進系統，如何產生斷詞結果、詞性標籤、命名實體、詞頻表，最後再轉成美食推薦系統可以使用的特徵。這樣學生會比較容易把抽象技術和實際研究任務連在一起。</p>
+  <h4>（4）學生容易誤解的地方</h4>
+  <p>學生常誤以為只要把文章丟進工具，就等於完成語料分析；但工具只是協助產生中介資料，真正的研究仍需要人工判斷、語言學解釋與問題意識。另一個常見誤解是把詞頻最高的詞直接當成最重要的詞，其實「的、了、是」可能很高頻卻沒有研究代表性；而 NER 或 POS 的標註結果也可能因模型、領域詞彙或斷詞錯誤而受到影響。因此本頁應提醒學生：自動化分析結果要檢查，不能盲目相信。</p>
+  <h4>（5）與前後頁的銜接關係</h4>
+  <p>本頁與前後頁的關係可以理解為課程流程中的一個節點。前一頁通常提供背景、工具或資料來源，這一頁進一步展示某個處理步驟或分析結果，下一頁則會把結果推向更高層次的解釋、比較或應用。教學時可反覆強調「資料 → 資訊 → 知識 → 應用」這條主線，讓學生知道每一張投影片雖然看起來是不同畫面，但其實都服務於同一個目標：建立能夠支持語言學研究與 AI 應用的語料分析流程。</p>
+</div>
+
+  </div>
+</details>
+</section>
+</main>
+<button id="topBtn" onclick="location.hash='top'">TOP</button>
+<footer class="footer">Corpus Linguistics × NLP × AI ｜ 每頁一個 accordion ｜ 圖片檔案位於 slides/slide_001.png 至 slides/slide_035.png</footer>
+<script>
+const cards=[...document.querySelectorAll('.slide-card')];
+function openAll(){cards.forEach(d=>d.open=true)}
+function closeAll(){cards.forEach(d=>d.open=false)}
+function toggleTheme(){const cur=document.documentElement.getAttribute('data-theme');document.documentElement.setAttribute('data-theme',cur==='dark'?'light':'dark');localStorage.setItem('theme',document.documentElement.getAttribute('data-theme'));}
+document.documentElement.setAttribute('data-theme',localStorage.getItem('theme')||'light');
+document.getElementById('search').addEventListener('input',e=>{const q=e.target.value.trim().toLowerCase();cards.forEach(d=>{const hit=(d.innerText+d.dataset.title+d.dataset.text).toLowerCase().includes(q);d.classList.toggle('hidden',q&&!hit); if(q&&hit)d.open=true;})});
+</script>
+</body>
+</html>

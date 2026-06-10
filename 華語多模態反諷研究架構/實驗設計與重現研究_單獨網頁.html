@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>實驗設計與重現研究｜華語多模態反諷辨識 AI 模型研究</title>
+<style>
+:root{
+  --navy:#0f2742;
+  --blue:#1d4ed8;
+  --cyan:#0891b2;
+  --green:#16a34a;
+  --orange:#d97706;
+  --red:#dc2626;
+  --purple:#7c3aed;
+  --gold:#c9a15a;
+  --paper:#f8fafc;
+  --ink:#172033;
+  --muted:#64748b;
+  --line:#d8e0ea;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#eef5fb 0%,#ffffff 420px);
+  color:var(--ink);
+  font-family:"Microsoft JhengHei","Noto Sans CJK TC",Arial,sans-serif;
+  line-height:1.85;
+}
+header{
+  background:linear-gradient(135deg,#0b1f36,#153e66);
+  color:#fff;
+  padding:42px 24px;
+  border-bottom:7px solid var(--gold);
+}
+.wrap{max-width:1220px;margin:auto}
+header h1{font-size:36px;line-height:1.35;margin:0 0 12px}
+header p{font-size:18px;color:#dbeafe;margin:0}
+.badge{
+  display:inline-block;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;
+  padding:8px 14px;
+  border-radius:999px;
+  margin-bottom:14px;
+  font-weight:800;
+}
+nav{
+  position:sticky;top:0;z-index:20;
+  background:rgba(255,255,255,.95);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(8px);
+}
+.navwrap{
+  max-width:1220px;margin:auto;
+  display:flex;gap:10px;flex-wrap:wrap;
+  padding:12px 18px;
+}
+.navwrap a{
+  display:inline-block;text-decoration:none;
+  padding:9px 16px;border-radius:999px;
+  background:#eef2f7;color:#334155;
+  font-weight:800;font-size:15px;
+}
+.navwrap a:hover,.navwrap a.active{
+  background:#4f46e5;color:white;
+}
+main{max-width:1220px;margin:auto;padding:28px 20px 70px}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:22px;
+  padding:26px;margin:26px 0;
+  box-shadow:0 12px 30px rgba(15,39,66,.08);
+}
+h2{
+  color:var(--navy);
+  font-size:28px;
+  border-left:8px solid var(--gold);
+  padding:8px 0 8px 14px;
+  background:#f8fafc;border-radius:10px;
+}
+h3{font-size:23px;color:#164e7a;margin-top:28px;border-bottom:1px solid var(--line);padding-bottom:6px}
+h4{font-size:20px;color:#0f2742;margin-bottom:6px}
+p,li{font-size:18px}
+a{color:#0b5cab;font-weight:700}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.mini{
+  border:1px solid var(--line);
+  background:#f8fafc;
+  border-radius:18px;
+  padding:18px;
+}
+.kpi{
+  font-size:36px;font-weight:900;color:#0f2742;
+}
+.tag{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#e0f2fe;
+  color:#075985;
+  font-size:14px;
+  font-weight:800;
+  margin:3px;
+}
+.table-wrap{overflow:auto;border-radius:16px;border:1px solid var(--line);margin:18px 0}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #cbd5e1;padding:11px 12px;vertical-align:top;font-size:16px}
+th{background:#eaf2f8;color:#0f2742;font-weight:900}
+pre{
+  white-space:pre-wrap;
+  background:#0f172a;color:#e5e7eb;
+  border-radius:16px;padding:18px;
+  overflow:auto;font-size:15px;line-height:1.65;
+}
+.note{
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  border-left:8px solid var(--orange);
+  padding:16px;border-radius:14px;
+}
+.warn{
+  background:#fef2f2;
+  border:1px solid #fecaca;
+  border-left:8px solid var(--red);
+  padding:16px;border-radius:14px;
+}
+.svgbox{background:white;border:1px solid #d5dfeb;border-radius:18px;padding:10px;overflow:auto}
+svg{width:100%;height:auto;min-width:950px}
+svg text{font-family:"Microsoft JhengHei",Arial,sans-serif;font-weight:800;fill:#102033;text-anchor:middle}
+.small{font-size:15px!important;font-weight:700!important;fill:#475569!important}
+.arr{stroke:#243b53;stroke-width:3;marker-end:url(#arrow)}
+.b1{fill:#dbeafe;stroke:#2563eb;stroke-width:2}
+.b2{fill:#dcfce7;stroke:#16a34a;stroke-width:2}
+.b3{fill:#fef3c7;stroke:#d97706;stroke-width:2}
+.b4{fill:#ede9fe;stroke:#7c3aed;stroke-width:2}
+.b5{fill:#fee2e2;stroke:#dc2626;stroke-width:2}
+.b6{fill:#e0f2fe;stroke:#0284c7;stroke-width:2}
+.footer{text-align:center;color:#64748b;border-top:1px solid var(--line);padding:26px;margin-top:30px}
+@media(max-width:900px){
+  .g2,.g3{grid-template-columns:1fr}
+  header h1{font-size:28px}
+}
+</style>
+
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head>
+<body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html" class="cmius-current">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+
+<header id="top">
+<div class="wrap">
+<span class="badge">博士論文計畫書｜單獨主題頁</span>
+<h1>實驗設計與重現研究</h1>
+<p>本頁聚焦於 MUStARD、MCSD、SarcNet 三個代表性研究的重現策略，並延伸到華語多模態反諷辨識模型的 fine-tuning、融合實驗、消融分析與最終目標。</p>
+</div>
+</header>
+
+<nav>
+<div class="navwrap">
+<a href="#overview" class="active">總覽</a>
+<a href="#workflow">流程圖</a>
+<a href="#reproduce">重現研究</a>
+<a href="#packages">軟體套件</a>
+<a href="#models">模型來源</a>
+<a href="#finetune">Fine-tune 路線</a>
+<a href="#experiments">實驗矩陣</a>
+<a href="#code">程式架構</a>
+<a href="#sources">來源連結</a>
+</div>
+</nav>
+
+<main>
+
+<section class="card" id="overview">
+<h2>一、主題定位：為什麼要做「實驗設計與重現研究」？</h2>
+<p>
+本研究的博士論文主軸是「華語多模態反諷辨識之 AI 模型研究」，因此實驗設計不能直接跳到自建模型，而應先完成代表性研究的重現。重現研究的目的有三個：第一，確認研究者已具備處理多模態資料的實作能力，包括文字轉錄、音訊切段、影像取幀、特徵擷取、模型訓練與評估；第二，建立可比較的 baseline，避免後續模型改良缺乏基準；第三，找出華語反諷辨識相對於英文資料、圖文資料與影音資料的差異。
+</p>
+<p>
+本頁將實驗設計分成四層：第一層是重現 MUStARD、MCSD 與 SarcNet；第二層是建立單模態 baseline，包括文字、語音、視覺與語境；第三層是建立多模態融合模型，包括 concatenation、late fusion、gated fusion、cross-modal attention 與 multimodal transformer；第四層是 fine-tune 到最終目標，也就是建立能處理華語文字、語音、影像、語境與隱喻反諷交互的模型。
+</p>
+
+<div class="grid g3">
+<div class="mini"><div class="kpi">01</div><h3>重現基準</h3><p>先重現 MUStARD、MCSD、SarcNet，建立可比較的 baseline。</p></div>
+<div class="mini"><div class="kpi">02</div><h3>華語延伸</h3><p>將英文或圖文研究流程轉化為華語影音、語境與語音特徵任務。</p></div>
+<div class="mini"><div class="kpi">03</div><h3>最終模型</h3><p>Fine-tune 多模態模型，完成華語反諷、隱喻反諷與語境推論辨識。</p></div>
+</div>
+</section>
+
+<section class="card" id="workflow">
+<h2>二、整體流程圖：從重現研究到最終 fine-tune 模型</h2>
+<p>
+下圖呈現本主題的完整技術路線。左側從三個代表性資料集與文獻開始，先完成資料整理與 baseline 重現；中段進入華語資料轉換與特徵擷取；右側則進入多模態融合、fine-tuning、消融實驗與最終華語多模態反諷理解系統。
+</p>
+
+<div class="svgbox">
+<svg viewBox="0 0 1400 520" role="img" aria-label="Fine-tune 到最終模型流程圖">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#243b53"/></marker>
+</defs>
+
+<rect x="40" y="60" width="190" height="90" rx="18" class="b1"/>
+<text x="135" y="95" font-size="23">MUStARD</text>
+<text x="135" y="125" class="small">英文影音＋語境</text>
+
+<rect x="40" y="210" width="190" height="90" rx="18" class="b2"/>
+<text x="135" y="245" font-size="23">MCSD</text>
+<text x="135" y="275" class="small">中文影音＋語音線索</text>
+
+<rect x="40" y="360" width="190" height="90" rx="18" class="b3"/>
+<text x="135" y="395" font-size="23">SarcNet</text>
+<text x="135" y="425" class="small">中英文圖文＋分模態標籤</text>
+
+<rect x="310" y="150" width="190" height="170" rx="22" class="b4"/>
+<text x="405" y="195" font-size="23">Baseline 重現</text>
+<text x="405" y="230" class="small">SVM / MLP</text>
+<text x="405" y="260" class="small">T / A / V / TAV</text>
+<text x="405" y="290" class="small">保存 seed 與切分</text>
+
+<line x1="230" y1="105" x2="310" y2="190" class="arr"/>
+<line x1="230" y1="255" x2="310" y2="235" class="arr"/>
+<line x1="230" y1="405" x2="310" y2="285" class="arr"/>
+
+<rect x="585" y="70" width="210" height="90" rx="18" class="b1"/>
+<text x="690" y="105" font-size="22">文字模型</text>
+<text x="690" y="135" class="small">BERT / MacBERT / XLM-R</text>
+
+<rect x="585" y="185" width="210" height="90" rx="18" class="b2"/>
+<text x="690" y="220" font-size="22">語音模型</text>
+<text x="690" y="250" class="small">Wav2Vec2 / HuBERT</text>
+
+<rect x="585" y="300" width="210" height="90" rx="18" class="b3"/>
+<text x="690" y="335" font-size="22">視覺模型</text>
+<text x="690" y="365" class="small">ViT / TimeSformer / CLIP</text>
+
+<rect x="585" y="415" width="210" height="70" rx="18" class="b4"/>
+<text x="690" y="455" font-size="22">語境 Encoder</text>
+
+<line x1="500" y1="235" x2="585" y2="115" class="arr"/>
+<line x1="500" y1="235" x2="585" y2="230" class="arr"/>
+<line x1="500" y1="235" x2="585" y2="345" class="arr"/>
+<line x1="500" y1="235" x2="585" y2="450" class="arr"/>
+
+<rect x="880" y="155" width="230" height="190" rx="24" class="b5"/>
+<text x="995" y="205" font-size="23">多模態融合</text>
+<text x="995" y="240" class="small">Concatenation</text>
+<text x="995" y="270" class="small">Gated Fusion</text>
+<text x="995" y="300" class="small">Cross-modal Attention</text>
+
+<line x1="795" y1="115" x2="880" y2="210" class="arr"/>
+<line x1="795" y1="230" x2="880" y2="245" class="arr"/>
+<line x1="795" y1="345" x2="880" y2="285" class="arr"/>
+<line x1="795" y1="450" x2="880" y2="320" class="arr"/>
+
+<rect x="1190" y="130" width="170" height="100" rx="20" class="b6"/>
+<text x="1275" y="170" font-size="23">Fine-tune</text>
+<text x="1275" y="202" class="small">華語反諷辨識</text>
+
+<rect x="1190" y="285" width="170" height="120" rx="20" class="b6"/>
+<text x="1275" y="325" font-size="23">最終目標</text>
+<text x="1275" y="357" class="small">反諷＋語境＋隱喻</text>
+<text x="1275" y="385" class="small">可解釋輸出</text>
+
+<line x1="1110" y1="250" x2="1190" y2="180" class="arr"/>
+<line x1="1275" y1="230" x2="1275" y2="285" class="arr"/>
+
+<path d="M995 345 C1020 450,1160 450,1275 405" fill="none" class="arr"/>
+<text x="1110" y="455" class="small">消融實驗與錯誤分析回饋模型</text>
+
+</svg>
+</div>
+</section>
+
+<section class="card" id="reproduce">
+<h2>三、三個代表性重現研究</h2>
+
+<h3>（一）MUStARD 重現：英文影音反諷 baseline</h3>
+<p>
+MUStARD 是多模態反諷辨識的經典資料集，資料來自電視劇或節目片段，每筆 utterance 具有文字轉錄、語音、影像與對話語境。重現 MUStARD 的目的，是建立影音多模態資料處理與 baseline 訓練能力。建議先重現 text-only，再加入 audio-only、visual-only 與 text+audio+visual。
+</p>
+<ul>
+<li>資料來源：MUStARD GitHub：<a href="https://github.com/soujanyaporia/MUStARD" target="_blank">https://github.com/soujanyaporia/MUStARD</a></li>
+<li>論文來源：ACL Anthology：<a href="https://aclanthology.org/P19-1455/" target="_blank">Towards Multimodal Sarcasm Detection</a></li>
+<li>文字模型：BERT-base / sentence embedding。</li>
+<li>語音特徵：Librosa MFCC、Mel-spectrogram、spectral centroid。</li>
+<li>視覺特徵：ResNet 或 ViT frame-level embedding。</li>
+<li>分類器：SVM、Logistic Regression、MLP。</li>
+</ul>
+
+<h3>（二）MCSD 重現：中文多模態反諷資料集</h3>
+<p>
+MCSD 是本研究最重要的華語參考資料，重點在中文影片、語音線索與標註信心。重現 MCSD 可直接建立華語反諷辨識 baseline。建議依照原研究採用 Chinese BERT、Wav2Vec2 與 TimeSformer 進行特徵擷取，再以 SVM 或 MLP 分類。
+</p>
+<ul>
+<li>論文來源：ISCA Archive：<a href="https://www.isca-archive.org/interspeech_2025/gao25f_interspeech.html" target="_blank">A Multimodal Chinese Dataset for Cross-lingual Sarcasm Detection</a></li>
+<li>標註設計來源：MCSD GitHub Wiki：<a href="https://github.com/x-y-g/MCSD/wiki" target="_blank">https://github.com/x-y-g/MCSD/wiki</a></li>
+<li>文字模型：bert-base-chinese。</li>
+<li>語音模型：Wav2Vec2 Chinese 或 HuBERT。</li>
+<li>影片模型：TimeSformer 或 VideoMAE。</li>
+<li>重現重點：比較 T、A、V、T+A、T+V、A+V、T+A+V。</li>
+</ul>
+
+<h3>（三）SarcNet 重現：圖文反諷與分模態標註</h3>
+<p>
+SarcNet 的重點不是影音，而是圖文反諷與分模態標註。它將 text label、image label 與 multimodal label 分開，對本研究的標註設計非常重要。重現 SarcNet 可讓研究者理解「文字單獨不反諷、圖片單獨不反諷，但圖文組合形成反諷」的資料結構。
+</p>
+<ul>
+<li>論文來源：ACL Anthology：<a href="https://aclanthology.org/2024.lrec-main.1248/" target="_blank">SarcNet: A Multilingual Multimodal Sarcasm Detection Dataset</a></li>
+<li>資料來源：SarcNet GitHub：<a href="https://github.com/yuetanbupt/SarcNet" target="_blank">https://github.com/yuetanbupt/SarcNet</a></li>
+<li>文字模型：BERT、Multilingual BERT、XLM-RoBERTa。</li>
+<li>圖像模型：ResNet、MobileNetV3、ViT、CLIP。</li>
+<li>多模態模型：DT4MID 或自建 cross-modal attention。</li>
+<li>延伸重點：將分模態標註觀念轉移到華語影音資料。</li>
+</ul>
+</section>
+
+<section class="card" id="packages">
+<h2>四、需要的軟體套件與用途</h2>
+<p>
+以下套件可支援資料處理、特徵擷取、模型訓練、評估與可視化。建議使用 Python 3.10、PyTorch 2.x、CUDA 12.x 與 Ubuntu 22.04 或 WSL2。
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>類別</th><th>套件</th><th>用途</th><th>來源連結</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>深度學習</td>
+<td>torch, torchvision, torchaudio</td>
+<td>模型訓練、GPU 加速、影像與語音處理</td>
+<td><a href="https://pytorch.org/" target="_blank">PyTorch</a></td>
+</tr>
+<tr>
+<td>Transformer</td>
+<td>transformers, datasets, evaluate, accelerate</td>
+<td>BERT、MacBERT、XLM-R、Wav2Vec2、訓練與評估</td>
+<td><a href="https://huggingface.co/docs/transformers/index" target="_blank">Hugging Face Transformers</a></td>
+</tr>
+<tr>
+<td>機器學習</td>
+<td>scikit-learn</td>
+<td>SVM、Logistic Regression、指標計算、cross-validation</td>
+<td><a href="https://scikit-learn.org/stable/" target="_blank">scikit-learn</a></td>
+</tr>
+<tr>
+<td>資料處理</td>
+<td>pandas, numpy, scipy</td>
+<td>CSV、特徵矩陣、統計與資料切分</td>
+<td><a href="https://pandas.pydata.org/" target="_blank">pandas</a></td>
+</tr>
+<tr>
+<td>語音處理</td>
+<td>librosa, soundfile, opensmile</td>
+<td>MFCC、pitch、energy、pause、聲學特徵</td>
+<td><a href="https://librosa.org/doc/latest/index.html" target="_blank">librosa</a></td>
+</tr>
+<tr>
+<td>影像/影片</td>
+<td>opencv-python, moviepy, ffmpeg-python, decord</td>
+<td>影片切段、取幀、轉音訊、影像前處理</td>
+<td><a href="https://opencv.org/" target="_blank">OpenCV</a>、<a href="https://ffmpeg.org/" target="_blank">FFmpeg</a></td>
+</tr>
+<tr>
+<td>模型管理</td>
+<td>pytorch-lightning, wandb, tensorboard</td>
+<td>訓練紀錄、實驗追蹤、loss 與 metric 可視化</td>
+<td><a href="https://lightning.ai/docs/pytorch/stable/" target="_blank">Lightning</a>、<a href="https://wandb.ai/" target="_blank">Weights & Biases</a></td>
+</tr>
+<tr>
+<td>可解釋性</td>
+<td>lime, shap, captum</td>
+<td>文字重要性、模態權重、模型解釋</td>
+<td><a href="https://captum.ai/" target="_blank">Captum</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>建議安裝指令</h3>
+<pre><code>conda create -n sarcasm-mm python=3.10
+conda activate sarcasm-mm
+
+pip install torch torchvision torchaudio
+pip install transformers datasets evaluate accelerate peft
+pip install scikit-learn pandas numpy scipy tqdm matplotlib seaborn
+pip install librosa soundfile opensmile
+pip install opencv-python moviepy ffmpeg-python decord pillow timm
+pip install pytorch-lightning tensorboard wandb
+pip install shap lime captum</code></pre>
+</section>
+
+<section class="card" id="models">
+<h2>五、模型來源、用途與連結</h2>
+<p>
+本研究的模型可分成文字、語音、視覺、影片、語境與多模態融合六類。建議先固定 encoder，抽取 embedding 後訓練 SVM baseline；接著再逐步 fine-tune encoder 或加入 adapter / LoRA，降低硬體需求。
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>模態</th><th>模型</th><th>建議用途</th><th>來源連結</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>文字</td>
+<td>bert-base-chinese</td>
+<td>中文文字 baseline、target utterance 分類</td>
+<td><a href="https://huggingface.co/google-bert/bert-base-chinese" target="_blank">Hugging Face</a></td>
+</tr>
+<tr>
+<td>文字</td>
+<td>hfl/chinese-macbert-base</td>
+<td>華語語意表徵、可作強文字 baseline</td>
+<td><a href="https://huggingface.co/hfl/chinese-macbert-base" target="_blank">Hugging Face</a></td>
+</tr>
+<tr>
+<td>文字</td>
+<td>hfl/chinese-roberta-wwm-ext</td>
+<td>中文 RoBERTa-wwm，適合與 BERT 比較</td>
+<td><a href="https://huggingface.co/hfl/chinese-roberta-wwm-ext" target="_blank">Hugging Face</a></td>
+</tr>
+<tr>
+<td>跨語言文字</td>
+<td>xlm-roberta-base</td>
+<td>SarcNet 中英文資料、跨語言對照</td>
+<td><a href="https://huggingface.co/FacebookAI/xlm-roberta-base" target="_blank">Hugging Face</a></td>
+</tr>
+<tr>
+<td>語音</td>
+<td>wav2vec2 / Chinese Wav2Vec2</td>
+<td>語音 embedding、華語反諷語調特徵</td>
+<td><a href="https://huggingface.co/models?search=wav2vec2%20chinese" target="_blank">Hugging Face 搜尋</a></td>
+</tr>
+<tr>
+<td>語音</td>
+<td>HuBERT</td>
+<td>自監督語音表徵，可與 Wav2Vec2 比較</td>
+<td><a href="https://huggingface.co/docs/transformers/model_doc/hubert" target="_blank">Transformers HuBERT</a></td>
+</tr>
+<tr>
+<td>語音/轉錄</td>
+<td>Whisper</td>
+<td>語音轉文字、語音 encoder 延伸實驗</td>
+<td><a href="https://github.com/openai/whisper" target="_blank">OpenAI Whisper GitHub</a></td>
+</tr>
+<tr>
+<td>圖像</td>
+<td>ResNet-50 / ResNet-152</td>
+<td>圖像 baseline、frame feature extraction</td>
+<td><a href="https://pytorch.org/vision/stable/models/resnet.html" target="_blank">Torchvision ResNet</a></td>
+</tr>
+<tr>
+<td>圖像</td>
+<td>Vision Transformer ViT</td>
+<td>圖像/影格特徵，SarcNet 圖文實驗</td>
+<td><a href="https://huggingface.co/google/vit-base-patch16-224" target="_blank">Hugging Face ViT</a></td>
+</tr>
+<tr>
+<td>影片</td>
+<td>TimeSformer</td>
+<td>影片時序表情與動作特徵</td>
+<td><a href="https://huggingface.co/facebook/timesformer-base-finetuned-k400" target="_blank">Hugging Face TimeSformer</a></td>
+</tr>
+<tr>
+<td>影片</td>
+<td>VideoMAE</td>
+<td>影片理解模型，可作 TimeSformer 替代</td>
+<td><a href="https://huggingface.co/docs/transformers/model_doc/videomae" target="_blank">Transformers VideoMAE</a></td>
+</tr>
+<tr>
+<td>圖文多模態</td>
+<td>CLIP / Chinese-CLIP</td>
+<td>圖文不一致、圖文語意對齊與反諷線索</td>
+<td><a href="https://github.com/OFA-Sys/Chinese-CLIP" target="_blank">Chinese-CLIP GitHub</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<section class="card" id="finetune">
+<h2>六、如何 fine-tune 到最終目標模型？</h2>
+
+<h3>Step 1：先抽取 embedding，不急著 fine-tune</h3>
+<p>
+第一階段不要直接訓練大型多模態模型，而是先將文字、語音、視覺與語境各自抽取成固定 embedding。例如文字使用 BERT 的 [CLS] embedding，語音使用 Wav2Vec2 的 pooled embedding，視覺使用 ViT 或 TimeSformer 的 pooled embedding。接著使用 SVM 或 MLP 訓練 baseline。這一步能快速驗證資料是否可用，也能建立後續比較基準。
+</p>
+
+<h3>Step 2：單模態 fine-tune</h3>
+<p>
+第二階段分別 fine-tune 文字、語音與視覺模型。文字模型可使用 target utterance，或將 context 與 target 串接為「[context] [SEP] [target]」。語音模型輸入切好的 utterance audio，視覺模型輸入 frames 或 video clips。此階段目標是建立最強單模態模型，避免後續多模態模型只是因為文字 baseline 太弱而看似有效。
+</p>
+
+<h3>Step 3：雙模態與三模態融合</h3>
+<p>
+第三階段建立 T+A、T+V、A+V 與 T+A+V 模型。最簡單的方法是將 embedding concat 後送入 MLP；進階方法可加入 gated fusion，讓模型自動決定哪個模態更重要；再進一步可使用 cross-modal attention，讓文字特徵查詢語音與影像線索，捕捉「文字表面正向、語氣或畫面負向」的不一致。
+</p>
+
+<h3>Step 4：加入語境與隱喻反諷特徵</h3>
+<p>
+第四階段加入 context encoder 與 metaphor-irony features。語境可以是前一至三句，也可以是整段對話。隱喻特徵可先使用人工標註欄位，例如 metaphor_label、metaphor_irony_interaction，再作為額外特徵加入分類器。最終目標不是只判斷反諷，而是讓模型能說明反諷來自文字、語音、影像、語境或隱喻評價反轉。
+</p>
+
+<h3>Step 5：最終模型輸出格式</h3>
+<pre><code>{
+  "prediction": "sarcasm",
+  "confidence": 0.91,
+  "text_score": 0.72,
+  "audio_score": 0.84,
+  "visual_score": 0.63,
+  "context_score": 0.88,
+  "metaphor_irony_interaction": true,
+  "main_trigger": "audio + context",
+  "explanation": "文字表面為稱讚，但語氣拖長且前文為負面事件，因此判定為反諷。"
+}</code></pre>
+
+<div class="note">
+<strong>博士論文寫法建議：</strong>每一次 fine-tune 都必須保存資料切分、random seed、learning rate、batch size、epoch、checkpoint、macro F1、weighted F1、confusion matrix 與錯誤案例。這樣後續論文才能清楚說明模型提升來自哪一個組件。
+</div>
+</section>
+
+<section class="card" id="experiments">
+<h2>七、實驗矩陣設計</h2>
+<p>
+實驗矩陣應由簡入繁，從單模態到多模態，再加入語境與隱喻。這樣才能回答「多模態到底有沒有幫助」、「哪個模態最重要」、「語境是否提升模型」、「隱喻反諷是否造成模型困難」。
+</p>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>實驗代號</th><th>輸入模態</th><th>模型</th><th>目的</th><th>主要指標</th></tr>
+</thead>
+<tbody>
+<tr><td>E1</td><td>T</td><td>BERT / MacBERT</td><td>建立文字 baseline</td><td>Macro F1</td></tr>
+<tr><td>E2</td><td>A</td><td>Wav2Vec2 / HuBERT</td><td>檢驗華語語音反諷線索</td><td>Macro F1</td></tr>
+<tr><td>E3</td><td>V</td><td>ViT / TimeSformer</td><td>檢驗表情與視覺線索</td><td>Macro F1</td></tr>
+<tr><td>E4</td><td>T+A</td><td>Concat / Gated Fusion</td><td>檢驗文字與語音互補</td><td>Macro F1、錯誤分析</td></tr>
+<tr><td>E5</td><td>T+V</td><td>CLIP / Cross Attention</td><td>檢驗圖文或影音視覺不一致</td><td>Macro F1</td></tr>
+<tr><td>E6</td><td>T+A+V</td><td>Multimodal Transformer</td><td>建立三模態主模型</td><td>Macro F1、Ablation</td></tr>
+<tr><td>E7</td><td>T+A+V+C</td><td>Context-aware Fusion</td><td>檢驗語境貢獻</td><td>Macro F1、FN 改善</td></tr>
+<tr><td>E8</td><td>T+A+V+C+M</td><td>Metaphor-Irony Model</td><td>檢驗隱喻反諷交互</td><td>案例分析、可解釋性</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>消融實驗</h3>
+<ul>
+<li>Full Model：T + A + V + Context + Metaphor features。</li>
+<li>– Text：移除文字，檢查模型是否過度依賴文字。</li>
+<li>– Audio：移除語音，檢查華語反諷語氣的貢獻。</li>
+<li>– Visual：移除影像，檢查表情與畫面反差是否有效。</li>
+<li>– Context：移除語境，檢查是否造成字面正向案例誤判。</li>
+<li>– Metaphor：移除隱喻交互特徵，檢查含隱喻反諷案例是否下降。</li>
+</ul>
+</section>
+
+<section class="card" id="code">
+<h2>八、建議程式架構</h2>
+<p>
+程式專案應將資料處理、特徵擷取、模型訓練與評估分開，避免所有程式混在一個 notebook。下面是建議架構。
+</p>
+
+<pre><code>CMIUS_experiments/
+│
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   ├── annotations/
+│   └── splits/
+│
+├── src/
+│   ├── preprocessing/
+│   │   ├── clean_text.py
+│   │   ├── extract_audio.py
+│   │   ├── extract_frames.py
+│   │   └── build_manifest.py
+│   │
+│   ├── features/
+│   │   ├── extract_text_bert.py
+│   │   ├── extract_audio_wav2vec.py
+│   │   ├── extract_visual_vit.py
+│   │   ├── extract_video_timesformer.py
+│   │   └── extract_context.py
+│   │
+│   ├── models/
+│   │   ├── text_classifier.py
+│   │   ├── audio_classifier.py
+│   │   ├── visual_classifier.py
+│   │   ├── concat_fusion.py
+│   │   ├── gated_fusion.py
+│   │   └── cross_modal_transformer.py
+│   │
+│   ├── training/
+│   │   ├── train_baseline_svm.py
+│   │   ├── train_text_finetune.py
+│   │   ├── train_audio_finetune.py
+│   │   ├── train_visual_finetune.py
+│   │   └── train_multimodal.py
+│   │
+│   └── evaluation/
+│       ├── evaluate_metrics.py
+│       ├── ablation_study.py
+│       ├── error_analysis.py
+│       └── explain_cases.py
+│
+├── configs/
+│   ├── mustard_baseline.yaml
+│   ├── mcsd_tav.yaml
+│   ├── sarcnet_text_image.yaml
+│   └── cmius_final.yaml
+│
+├── checkpoints/
+├── results/
+├── logs/
+└── reports/</code></pre>
+
+<h3>訓練流程 pseudo-code</h3>
+<pre><code># 1. 載入資料
+manifest = load_manifest("data/processed/train.csv")
+
+# 2. 抽取各模態特徵
+text_emb = TextEncoder("hfl/chinese-macbert-base")(manifest.text)
+audio_emb = AudioEncoder("wav2vec2-chinese")(manifest.audio_path)
+visual_emb = VideoEncoder("timesformer")(manifest.video_path)
+context_emb = ContextEncoder("bert-base-chinese")(manifest.context)
+
+# 3. 多模態融合
+fusion = CrossModalFusion()
+z = fusion(text_emb, audio_emb, visual_emb, context_emb)
+
+# 4. 分類
+logits = classifier(z)
+loss = cross_entropy(logits, labels)
+
+# 5. 評估
+metrics = compute_metrics(logits, labels)
+save_results(metrics, confusion_matrix, error_cases)</code></pre>
+</section>
+
+<section class="card" id="sources">
+<h2>九、主要來源與連結</h2>
+<ul>
+<li>MUStARD 論文：<a href="https://aclanthology.org/P19-1455/" target="_blank">https://aclanthology.org/P19-1455/</a></li>
+<li>MUStARD GitHub：<a href="https://github.com/soujanyaporia/MUStARD" target="_blank">https://github.com/soujanyaporia/MUStARD</a></li>
+<li>MCSD 論文：<a href="https://www.isca-archive.org/interspeech_2025/gao25f_interspeech.html" target="_blank">https://www.isca-archive.org/interspeech_2025/gao25f_interspeech.html</a></li>
+<li>MCSD GitHub Wiki：<a href="https://github.com/x-y-g/MCSD/wiki" target="_blank">https://github.com/x-y-g/MCSD/wiki</a></li>
+<li>SarcNet 論文：<a href="https://aclanthology.org/2024.lrec-main.1248/" target="_blank">https://aclanthology.org/2024.lrec-main.1248/</a></li>
+<li>SarcNet GitHub：<a href="https://github.com/yuetanbupt/SarcNet" target="_blank">https://github.com/yuetanbupt/SarcNet</a></li>
+<li>Hugging Face Transformers：<a href="https://huggingface.co/docs/transformers/index" target="_blank">https://huggingface.co/docs/transformers/index</a></li>
+<li>PyTorch：<a href="https://pytorch.org/" target="_blank">https://pytorch.org/</a></li>
+<li>scikit-learn：<a href="https://scikit-learn.org/stable/" target="_blank">https://scikit-learn.org/stable/</a></li>
+<li>librosa：<a href="https://librosa.org/doc/latest/index.html" target="_blank">https://librosa.org/doc/latest/index.html</a></li>
+<li>OpenCV：<a href="https://opencv.org/" target="_blank">https://opencv.org/</a></li>
+<li>FFmpeg：<a href="https://ffmpeg.org/" target="_blank">https://ffmpeg.org/</a></li>
+</ul>
+</section>
+
+</main>
+
+<div class="footer">
+實驗設計與重現研究｜華語多模態反諷辨識 AI 模型研究｜單頁 HTML
+</div>
+</body>
+</html>

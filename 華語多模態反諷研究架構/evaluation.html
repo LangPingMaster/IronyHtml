@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>評估、消融實驗、可解釋分析與論文章節</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html" class="cmius-current">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html" class="active">評估與論文</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>評估、消融實驗、可解釋分析與論文章節</h1><p>將模型結果轉化為博士論文可用的實驗證據與章節架構。</p></div></header><main class="wrap">
+<section class="card"><h2>一、實驗設計</h2><div class="grid g4"><div class="card"><h3>單模態</h3><p>Text only、Image only、Audio only、Video only、Context only。</p></div><div class="card"><h3>雙模態</h3><p>Text+Image、Text+Audio、Text+Video、Text+Context。</p></div><div class="card"><h3>三模態</h3><p>Text+Image+Audio、Text+Image+Context、Text+Video+Context。</p></div><div class="card"><h3>全模態</h3><p>Text+Image+Audio+Video+Context+User Behavior。</p></div></div></section>
+<section class="grid g2"><div class="card"><h2>二、評估指標</h2><table class="table"><tr><th>指標</th><th>用途</th></tr><tr><td>Accuracy</td><td>整體正確率。</td></tr><tr><td>Precision</td><td>預測為反諷時有多少是真的。</td></tr><tr><td>Recall</td><td>真正反諷中有多少被找出。</td></tr><tr><td>Macro-F1</td><td>類別不平衡時較重要。</td></tr><tr><td>Cohen’s / Fleiss’ Kappa</td><td>標註一致性。</td></tr><tr><td>Confusion Matrix</td><td>分析錯誤類型。</td></tr></table></div><div class="card"><h2>三、消融實驗</h2><pre>Full Model
+- Text
+- Image
+- Audio
+- Video
+- Context
+- Metaphor Feature
+- User Behavior</pre><p>目的：驗證每一個模態與隱喻特徵是否真的提升反諷辨識。</p></div></section>
+<section class="card"><h2>四、可解釋 AI 分析</h2><div class="grid g3"><div><h3>文字</h3><p>Attention heatmap、SHAP、LIME，找出模型依賴哪些詞。</p></div><div><h3>圖片</h3><p>Grad-CAM 顯示模型注意的圖片區域，例如表情、物件、場景矛盾。</p></div><div><h3>語音</h3><p>Pitch、Intensity、Pause 視覺化，分析語調是否形成反諷線索。</p></div></div></section>
+<section class="card"><h2>五、博士論文章節對應</h2><table class="table"><tr><th>章節</th><th>內容</th></tr><tr><td>Chapter 1</td><td>緒論：研究背景、問題、目的與貢獻。</td></tr><tr><td>Chapter 2</td><td>文獻探討：反諷、諷刺、隱喻、多模態模型。</td></tr><tr><td>Chapter 3</td><td>華語多模態反諷語料庫建置。</td></tr><tr><td>Chapter 4</td><td>標註準則與一致性分析。</td></tr><tr><td>Chapter 5</td><td>單模態與多模態 Baseline。</td></tr><tr><td>Chapter 6</td><td>隱喻－反諷互動模型。</td></tr><tr><td>Chapter 7</td><td>多模態融合模型。</td></tr><tr><td>Chapter 8</td><td>消融實驗與可解釋分析。</td></tr><tr><td>Chapter 9</td><td>結論與未來研究。</td></tr></table></section>
+<section class="note"><strong>最終研究主張：</strong>本研究建立一套結合文字、圖片、語音、影片、上下文與隱喻分析的華語多模態反諷理解系統，並透過分離式標註、多模態融合、消融實驗與可解釋 AI 驗證各模態對反諷辨識的實際貢獻。</section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

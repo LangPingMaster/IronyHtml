@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMIUS 全站導覽</title>
+<style>
+body{margin:0;background:linear-gradient(180deg,#eef5fb,#fff);font-family:"Microsoft JhengHei",Arial,sans-serif;color:#172033;line-height:1.8}
+header{background:linear-gradient(135deg,#071f36,#113e67);color:#fff;padding:38px 22px;border-bottom:7px solid #d6aa55;text-align:center}
+header h1{margin:0;font-size:34px}header p{color:#dbeafe;font-size:18px}
+main{max-width:1180px;margin:auto;padding:30px 20px 60px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{display:block;text-decoration:none;color:#172033;background:#fff;border:1px solid #d8e0ea;border-radius:20px;padding:22px;box-shadow:0 10px 24px rgba(15,39,66,.08);transition:.2s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(15,39,66,.15);border-color:#d6aa55}
+.card h2{margin:10px 0;color:#0f2742;font-size:23px}
+.card p{margin:0;color:#64748b;font-size:17px}
+.tag{display:inline-block;background:#e0f2fe;color:#075985;font-weight:900;border-radius:999px;padding:4px 10px;font-size:13px}
+.note{background:#fff7ed;border:1px solid #fed7aa;border-left:8px solid #d6aa55;border-radius:16px;padding:18px;margin-bottom:24px;font-size:18px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}header h1{font-size:28px}}
+</style>
+
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head>
+<body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html" class="cmius-current">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+
+<header><h1>CMIUS 華語多模態反諷研究｜全站導覽</h1><p>此頁只提供連結介面；原本各網頁內容與資料未做刪改。</p></header>
+<main>
+<div class="note">請從下方選擇要開啟的頁面。每一個頁面上方也已新增相同的全站導覽列，方便彼此切換。</div>
+<div class="grid">
+
+    <a class="card" href="index.html">
+      <span class="tag">HTML</span>
+      <h2>總覽</h2>
+      <p>開啟「總覽」頁面。</p>
+    </a>
+    
+    <a class="card" href="hardware.html">
+      <span class="tag">HTML</span>
+      <h2>硬體架構</h2>
+      <p>開啟「硬體架構」頁面。</p>
+    </a>
+    
+    <a class="card" href="software.html">
+      <span class="tag">HTML</span>
+      <h2>軟體套件</h2>
+      <p>開啟「軟體套件」頁面。</p>
+    </a>
+    
+    <a class="card" href="models.html">
+      <span class="tag">HTML</span>
+      <h2>模型設計</h2>
+      <p>開啟「模型設計」頁面。</p>
+    </a>
+    
+    <a class="card" href="program.html">
+      <span class="tag">HTML</span>
+      <h2>程式架構</h2>
+      <p>開啟「程式架構」頁面。</p>
+    </a>
+    
+    <a class="card" href="workflow.html">
+      <span class="tag">HTML</span>
+      <h2>執行步驟</h2>
+      <p>開啟「執行步驟」頁面。</p>
+    </a>
+    
+    <a class="card" href="evaluation.html">
+      <span class="tag">HTML</span>
+      <h2>評估與論文</h2>
+      <p>開啟「評估與論文」頁面。</p>
+    </a>
+    
+    <a class="card" href="實驗設計與重現研究_單獨網頁.html">
+      <span class="tag">HTML</span>
+      <h2>實驗設計與重現研究</h2>
+      <p>開啟「實驗設計與重現研究」頁面。</p>
+    </a>
+    
+    <a class="card" href="華語多模態反諷研究圖片詳解_pic1.html">
+      <span class="tag">HTML</span>
+      <h2>研究圖片詳解</h2>
+      <p>開啟「研究圖片詳解」頁面。</p>
+    </a>
+    
+    <a class="card" href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">
+      <span class="tag">HTML</span>
+      <h2>博士論文計畫書</h2>
+      <p>開啟「博士論文計畫書」頁面。</p>
+    </a>
+    
+</div>
+</main>
+</body>
+</html>

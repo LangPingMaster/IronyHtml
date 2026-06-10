@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>軟體、模型套件與 Python 環境</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html" class="cmius-current">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html" class="active">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>軟體、模型套件與 Python 環境</h1><p>完整列出作業系統、Python 環境、NLP/影像/語音/影片處理套件與安裝指令。</p></div></header><main class="wrap">
+<section class="card"><h2>一、軟體堆疊總覽</h2><div class="flow"><svg viewBox="0 0 1000 440"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569" /></marker></defs>
+<rect x="80" y="50" width="840" height="60" rx="18" class="box-blue"/><text x="500" y="88" text-anchor="middle" font-weight="900">Ubuntu 22.04 / Windows 11 + WSL2</text>
+<rect x="130" y="135" width="740" height="60" rx="18" class="box-cyan"/><text x="500" y="173" text-anchor="middle" font-weight="900">CUDA + cuDNN + NVIDIA Driver</text>
+<rect x="180" y="220" width="640" height="60" rx="18" class="box-green"/><text x="500" y="258" text-anchor="middle" font-weight="900">Conda Python 3.10 + PyTorch</text>
+<rect x="120" y="315" width="160" height="65" rx="18" class="box"/><text x="200" y="350" text-anchor="middle" font-weight="800">NLP</text><text x="200" y="370" text-anchor="middle" class="small">Transformers</text>
+<rect x="320" y="315" width="160" height="65" rx="18" class="box"/><text x="400" y="350" text-anchor="middle" font-weight="800">Vision</text><text x="400" y="370" text-anchor="middle" class="small">OpenCV / timm</text>
+<rect x="520" y="315" width="160" height="65" rx="18" class="box"/><text x="600" y="350" text-anchor="middle" font-weight="800">Audio</text><text x="600" y="370" text-anchor="middle" class="small">librosa / torchaudio</text>
+<rect x="720" y="315" width="160" height="65" rx="18" class="box"/><text x="800" y="350" text-anchor="middle" font-weight="800">Experiment</text><text x="800" y="370" text-anchor="middle" class="small">MLflow / W&B</text>
+</svg></div></section>
+<section class="grid g2"><div class="card"><h2>二、環境安裝指令</h2><pre>conda create -n sarcasm310 python=3.10
+conda activate sarcasm310
+pip install torch torchvision torchaudio
+pip install transformers datasets tokenizers sentencepiece
+pip install pandas numpy scikit-learn tqdm matplotlib
+pip install pillow opencv-python timm
+pip install librosa soundfile torchaudio opensmile
+pip install moviepy decord ffmpeg-python
+pip install pytorch-lightning accelerate evaluate peft
+pip install opencc jieba ckip-transformers</pre></div><div class="card"><h2>三、套件用途</h2><table class="table"><tr><th>套件</th><th>用途</th></tr><tr><td>transformers</td><td>載入 Chinese-BERT、MacBERT、RoBERTa、CLIP。</td></tr><tr><td>timm / torchvision</td><td>ViT、Swin、ResNet 圖像特徵擷取。</td></tr><tr><td>librosa / torchaudio</td><td>音訊切割、頻譜、Wav2Vec2 特徵。</td></tr><tr><td>moviepy / decord</td><td>影片切段、抽幀、轉音訊。</td></tr><tr><td>pytorch-lightning</td><td>統一訓練流程、checkpoint、log。</td></tr></table></div></section>
+<section class="card"><h2>四、軟體模組清單</h2><div class="grid g4"><div><h3>NLP</h3><span class="pill">bert-base-chinese</span><span class="pill">MacBERT</span><span class="pill">Chinese-RoBERTa</span><span class="pill">CKIP</span></div><div><h3>Vision</h3><span class="pill">ResNet</span><span class="pill">ViT</span><span class="pill">Swin</span><span class="pill">CLIP</span></div><div><h3>Audio/Video</h3><span class="pill">Wav2Vec2</span><span class="pill">Whisper</span><span class="pill">TimeSformer</span><span class="pill">VideoMAE</span></div><div><h3>Explainable AI</h3><span class="pill">SHAP</span><span class="pill">LIME</span><span class="pill">Grad-CAM</span><span class="pill">Attention Map</span></div></div></section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

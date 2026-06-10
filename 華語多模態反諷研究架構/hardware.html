@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>硬體架構與運算資源規劃</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html" class="cmius-current">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html">總覽</a><a href="hardware.html" class="active">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>硬體架構與運算資源規劃</h1><p>從最低可執行版本到高階 GPU 伺服器，規劃資料處理、特徵擷取與模型訓練所需資源。</p></div></header><main class="wrap">
+<section class="card"><h2>一、硬體架構總覽</h2><p>硬體規劃分成三個層級：最低可執行版、博士論文建議版、高階伺服器版。先以單機完成資料處理與 baseline，再將大型模型訓練移至 GPU 伺服器或雲端。</p><div class="flow"><svg viewBox="0 0 1100 360"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569" /></marker></defs>
+<rect x="55" y="60" width="270" height="210" rx="24" class="box-blue"/><text x="190" y="100" text-anchor="middle" font-size="22" font-weight="900">最低可執行版</text><text x="90" y="140">CPU：i7 / Ryzen 7</text><text x="90" y="170">RAM：32GB</text><text x="90" y="200">GPU：RTX 3060/4060 12GB</text><text x="90" y="230">SSD：1TB</text><text x="90" y="260">用途：資料處理、文字 baseline</text>
+<line x1="325" y1="165" x2="415" y2="165" class="arrow"/>
+<rect x="415" y="60" width="270" height="210" rx="24" class="box-green"/><text x="550" y="100" text-anchor="middle" font-size="22" font-weight="900">博士建議版</text><text x="450" y="140">CPU：i9 / Ryzen 9</text><text x="450" y="170">RAM：64GB–128GB</text><text x="450" y="200">GPU：RTX 4090 / A5000 24GB</text><text x="450" y="230">SSD：2TB NVMe + 4TB 備份</text><text x="450" y="260">用途：多模態訓練、消融實驗</text>
+<line x1="685" y1="165" x2="775" y2="165" class="arrow"/>
+<rect x="775" y="60" width="270" height="210" rx="24" class="box-orange"/><text x="910" y="100" text-anchor="middle" font-size="22" font-weight="900">高階伺服器</text><text x="810" y="140">GPU：A100 40/80GB 或 H100</text><text x="810" y="170">RAM：256GB+</text><text x="810" y="200">Storage：10TB+</text><text x="810" y="230">CUDA：12.x</text><text x="810" y="260">用途：大型 Transformer 最終實驗</text>
+</svg></div></section>
+<section class="grid g3"><div class="card"><h3>資料處理節點</h3><p>負責爬蟲、文字清洗、圖片壓縮、影片切段、音訊抽取、metadata 建立。</p><span class="pill">CPU 密集</span><span class="pill">大容量硬碟</span></div><div class="card"><h3>特徵擷取節點</h3><p>用 BERT、ViT、Wav2Vec2、TimeSformer 先抽 embedding，降低後續訓練成本。</p><span class="pill">GPU 12GB+</span><span class="pill">批次處理</span></div><div class="card"><h3>訓練節點</h3><p>訓練 Cross-Attention Fusion、Metaphor-Irony Layer、Ablation Study。</p><span class="pill">GPU 24GB+</span><span class="pill">實驗紀錄</span></div></section>
+<section class="card"><h2>二、建議儲存配置</h2><table class="table"><tr><th>資料類型</th><th>位置</th><th>建議容量</th><th>說明</th></tr><tr><td>原始文字與 metadata</td><td>data/raw/text</td><td>50GB</td><td>CSV/JSON 格式，需版本控管。</td></tr><tr><td>圖片與影片</td><td>data/raw/image, data/raw/video</td><td>2TB–8TB</td><td>影片檔案最占空間，建議外接備份。</td></tr><tr><td>特徵檔</td><td>data/processed/features</td><td>500GB–2TB</td><td>.pt / .npy embedding，可避免重複抽特徵。</td></tr><tr><td>模型 checkpoint</td><td>checkpoints</td><td>500GB+</td><td>每次訓練保存最佳模型與設定檔。</td></tr></table></section>
+<section class="warn"><strong>實作建議：</strong>第一年可先用 RTX 3060/4060 完成資料整理、標註平台與文字模型；第二年開始多模態融合時，建議升級到 RTX 4090 或使用雲端 GPU。</section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

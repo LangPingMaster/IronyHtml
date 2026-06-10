@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>模型設計：CMIUS 多模態反諷理解模型</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html" class="cmius-current">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html" class="active">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>模型設計：CMIUS 多模態反諷理解模型</h1><p>從單模態 baseline 到 Cross-Attention Fusion 與隱喻－反諷推理層，建立博士論文核心模型。</p></div></header><main class="wrap">
+<section class="card"><h2>一、CMIUS 主模型架構</h2><p>主模型以多個 encoder 分別處理文字、圖片、語音、影片、上下文與使用者背景，再透過 Cross-Modal Attention 與 Metaphor-Irony Reasoning Layer 進行融合。</p><div class="flow"><svg viewBox="0 0 1120 560"><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569" /></marker></defs>
+<rect x="40" y="50" width="160" height="60" rx="16" class="box-blue"/><text x="120" y="86" text-anchor="middle" font-weight="800">Text</text>
+<rect x="40" y="130" width="160" height="60" rx="16" class="box-cyan"/><text x="120" y="166" text-anchor="middle" font-weight="800">Image</text>
+<rect x="40" y="210" width="160" height="60" rx="16" class="box-green"/><text x="120" y="246" text-anchor="middle" font-weight="800">Audio</text>
+<rect x="40" y="290" width="160" height="60" rx="16" class="box-orange"/><text x="120" y="326" text-anchor="middle" font-weight="800">Video</text>
+<rect x="40" y="370" width="160" height="60" rx="16" class="box-red"/><text x="120" y="406" text-anchor="middle" font-weight="800">Context/User</text>
+<rect x="280" y="50" width="190" height="60" rx="16" class="box"/><text x="375" y="86" text-anchor="middle">Chinese-BERT</text>
+<rect x="280" y="130" width="190" height="60" rx="16" class="box"/><text x="375" y="166" text-anchor="middle">ViT / CLIP</text>
+<rect x="280" y="210" width="190" height="60" rx="16" class="box"/><text x="375" y="246" text-anchor="middle">Wav2Vec2</text>
+<rect x="280" y="290" width="190" height="60" rx="16" class="box"/><text x="375" y="326" text-anchor="middle">TimeSformer</text>
+<rect x="280" y="370" width="190" height="60" rx="16" class="box"/><text x="375" y="406" text-anchor="middle">Context Encoder</text>
+<line x1="200" y1="80" x2="280" y2="80" class="arrow"/><line x1="200" y1="160" x2="280" y2="160" class="arrow"/><line x1="200" y1="240" x2="280" y2="240" class="arrow"/><line x1="200" y1="320" x2="280" y2="320" class="arrow"/><line x1="200" y1="400" x2="280" y2="400" class="arrow"/>
+<rect x="560" y="155" width="230" height="130" rx="24" class="box-blue"/><text x="675" y="205" text-anchor="middle" font-size="20" font-weight="900">Cross-Modal</text><text x="675" y="235" text-anchor="middle" font-size="20" font-weight="900">Attention Fusion</text>
+<path d="M470 80 C520 80 520 185 560 185" fill="none" class="arrow"/><path d="M470 160 C525 160 525 205 560 205" fill="none" class="arrow"/><path d="M470 240 C525 240 525 225 560 225" fill="none" class="arrow"/><path d="M470 320 C520 320 520 245 560 245" fill="none" class="arrow"/><path d="M470 400 C525 400 525 265 560 265" fill="none" class="arrow"/>
+<rect x="860" y="95" width="210" height="90" rx="22" class="box-green"/><text x="965" y="130" text-anchor="middle" font-weight="900">Metaphor-Irony</text><text x="965" y="158" text-anchor="middle" font-weight="900">Reasoning Layer</text>
+<line x1="790" y1="220" x2="860" y2="145" class="arrow"/>
+<rect x="860" y="245" width="210" height="90" rx="22" class="box-orange"/><text x="965" y="280" text-anchor="middle" font-weight="900">Modality</text><text x="965" y="308" text-anchor="middle" font-weight="900">Contribution Layer</text>
+<line x1="790" y1="230" x2="860" y2="285" class="arrow"/>
+<rect x="860" y="395" width="210" height="80" rx="22" class="box-red"/><text x="965" y="430" text-anchor="middle" font-weight="900">Classifier</text><text x="965" y="455" text-anchor="middle" class="small">Literal / Metaphor / Irony / Sarcasm</text>
+<line x1="965" y1="185" x2="965" y2="245" class="arrow"/><line x1="965" y1="335" x2="965" y2="395" class="arrow"/>
+</svg></div></section>
+<section class="grid g2"><div class="card"><h2>二、Baseline 模型</h2><table class="table"><tr><th>模態</th><th>模型</th><th>輸出</th></tr><tr><td>文字</td><td>Chinese-BERT / MacBERT</td><td>反諷機率</td></tr><tr><td>圖片</td><td>ResNet / ViT / CLIP</td><td>視覺反諷線索</td></tr><tr><td>語音</td><td>Wav2Vec2 / openSMILE + SVM</td><td>語調與韻律線索</td></tr><tr><td>影片</td><td>TimeSformer / VideoMAE</td><td>表情與動作線索</td></tr><tr><td>上下文</td><td>Context BERT</td><td>前後文衝突</td></tr></table></div><div class="card"><h2>三、融合策略</h2><details open><summary>Early Fusion</summary><div>先把各模態 embedding 串接，再送入 MLP。適合第一個 baseline。</div></details><details><summary>Late Fusion</summary><div>各模態先獨立預測，再用加權投票或 MLP 合併。</div></details><details><summary>Cross-Attention Fusion</summary><div>讓文字注意圖片、圖片注意文字、語音注意上下文，用於博士論文核心模型。</div></details><details><summary>Modality Contribution Layer</summary><div>計算每個模態對預測的貢獻，支援可解釋分析與消融實驗。</div></details></div></section>
+<section class="card"><h2>四、輸出格式</h2><pre>{
+  "id": "0001",
+  "prediction": "sarcasm",
+  "confidence": 0.91,
+  "text_score": 0.72,
+  "image_score": 0.66,
+  "audio_score": 0.81,
+  "context_score": 0.88,
+  "metaphor_detected": true,
+  "trigger": "Text + Context",
+  "explanation": "文字表面為稱讚，但上下文顯示負面事件，因此形成反諷。"
+}</pre></section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

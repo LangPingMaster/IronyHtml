@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>華語多模態反諷辨識 AI 模型研究｜總覽</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html" class="cmius-current">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html" class="active">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html" class="active">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="華語多模態反諷研究圖片詳解_pic1.html">華語多模態反諷辨識 AI 模型研究圖片</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>華語多模態反諷辨識 AI 模型研究｜總覽</h1><p>本網站整合研究執行策略、硬體軟體架構、模型流程、程式專案架構與一步一步完成方法。</p></div></header><main class="wrap">
+<section class="grid g3">
+ <div class="card"><div class="kpi">01</div><h3>研究核心</h3><p>建立「華語多模態反諷理解系統」，不是只做二分類器，而是同時處理文字、圖片、語音、影片、上下文、使用者背景與隱喻－反諷互動。</p></div>
+ <div class="card"><div class="kpi">07</div><h3>網站頁面</h3><p>本版本將硬體、軟體、模型、套件、程式架構、訓練流程與評估方法拆成多個網頁，方便展示與後續擴充。</p></div>
+ <div class="card"><div class="kpi">48</div><h3>建議月期程</h3><p>依博士論文規模分成資料建置、標註、Baseline、多模態融合、可解釋分析與論文撰寫。</p></div>
+</section>
+<section class="card"><h2>一、整體研究系統流程圖</h2><p class="muted">從資料蒐集到模型評估，建立可重現、可比較、可解釋的華語多模態反諷研究框架。</p><div class="flow"><svg viewBox="0 0 1100 340" role="img"><title>整體研究流程</title><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#475569" /></marker></defs>
+<rect x="30" y="55" width="145" height="80" rx="18" class="box-blue"/><text x="102" y="88" text-anchor="middle" font-weight="800">資料蒐集</text><text x="102" y="115" text-anchor="middle" class="small">社群／影音／留言</text>
+<line x1="175" y1="95" x2="235" y2="95" class="arrow"/>
+<rect x="235" y="55" width="145" height="80" rx="18" class="box-cyan"/><text x="307" y="88" text-anchor="middle" font-weight="800">資料清理</text><text x="307" y="115" text-anchor="middle" class="small">去噪／切段／轉錄</text>
+<line x1="380" y1="95" x2="440" y2="95" class="arrow"/>
+<rect x="440" y="55" width="145" height="80" rx="18" class="box-green"/><text x="512" y="88" text-anchor="middle" font-weight="800">人工標註</text><text x="512" y="115" text-anchor="middle" class="small">文字/圖片/多模態</text>
+<line x1="585" y1="95" x2="645" y2="95" class="arrow"/>
+<rect x="645" y="55" width="145" height="80" rx="18" class="box-orange"/><text x="717" y="88" text-anchor="middle" font-weight="800">特徵擷取</text><text x="717" y="115" text-anchor="middle" class="small">BERT/ViT/Wav2Vec</text>
+<line x1="790" y1="95" x2="850" y2="95" class="arrow"/>
+<rect x="850" y="55" width="190" height="80" rx="18" class="box-red"/><text x="945" y="88" text-anchor="middle" font-weight="800">多模態模型</text><text x="945" y="115" text-anchor="middle" class="small">Fusion Transformer</text>
+<line x1="945" y1="135" x2="945" y2="190" class="arrow"/>
+<rect x="800" y="190" width="290" height="95" rx="22" class="box"/><text x="945" y="225" text-anchor="middle" font-weight="900">評估與論文產出</text><text x="945" y="252" text-anchor="middle" class="small">消融實驗、錯誤分析、可解釋 AI</text>
+<path d="M512 135 C512 245,650 252,800 238" fill="none" class="arrow"/><text x="620" y="232" class="small">標註一致性與資料品質驗證</text>
+</svg></div></section>
+<section class="grid g2"><div class="card"><h2>二、頁面導覽</h2><div class="btns"><a class="btn" href="hardware.html">硬體架構</a><a class="btn" href="software.html">軟體與套件</a><a class="btn" href="models.html">模型設計</a><a class="btn" href="program.html">程式架構</a><a class="btn" href="workflow.html">一步一步執行</a><a class="btn" href="evaluation.html">評估與論文</a></div></div><div class="card"><h2>三、文獻依據</h2><p>MUStARD 指出反諷可由語調、重音、拖長音節、表情與對話脈絡共同形成；SarcNet 強調文字、圖片、多模態應分離標註；MCSD 則提供華語多模態反諷資料集與標註一致性設計。</p><div class="ref">主要依據：MUStARD、SarcNet、MCSD、Multimodal Sarcasm Survey、Transformer-based Irony and Sarcasm Detection、Dual Generative Processes、Chinese sarcasm with user behavior。</div></div></section>
+<section class="card"><h2>四、整體系統名稱</h2><div class="note"><strong>CMIUS：Chinese Multimodal Irony Understanding System</strong><br>中文名稱：華語多模態反諷理解系統。核心任務是讓 AI 同時理解字面義、語境、模態衝突、隱喻與反諷意圖。</div></section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

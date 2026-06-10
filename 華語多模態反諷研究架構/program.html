@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>程式架構與專案資料夾設計</title><link rel="stylesheet" href="assets/style.css">
+<!-- CMIUS global link interface: added only for cross-page navigation -->
+<style id="cmius-global-link-style">
+.cmius-global-menu{position:sticky;top:0;z-index:9999;background:linear-gradient(135deg,#071f36,#113e67);border-bottom:4px solid #d6aa55;box-shadow:0 8px 22px rgba(0,0,0,.18);font-family:"Microsoft JhengHei",Arial,sans-serif}
+.cmius-global-menu *{box-sizing:border-box}
+.cmius-global-inner{max-width:1280px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cmius-global-brand{color:#fff;text-decoration:none;font-weight:900;font-size:18px;letter-spacing:.5px;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.cmius-global-links{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cmius-global-links a{color:#eaf4ff;text-decoration:none;font-weight:800;font-size:15px;padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);transition:.2s ease}
+.cmius-global-links a:hover{background:#d6aa55;color:#102033;transform:translateY(-1px)}
+.cmius-global-links a.cmius-current{background:#fff;color:#0f2742;border-color:#fff;box-shadow:0 3px 10px rgba(255,255,255,.25)}
+.cmius-global-toggle{display:none;color:#fff;font-weight:900;margin-left:auto;background:#d6aa55;color:#102033;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media(max-width:860px){.cmius-global-inner{align-items:flex-start}.cmius-global-brand{width:100%;justify-content:center}.cmius-global-links{width:100%;justify-content:center}.cmius-global-links a{font-size:14px;padding:7px 10px}}
+</style>
+</head><body>
+<!-- CMIUS global link interface: start -->
+<div class="cmius-global-menu" role="navigation" aria-label="全站導覽連結">
+  <div class="cmius-global-inner">
+    <a class="cmius-global-brand" href="全站導覽.html">CMIUS 全站導覽</a>
+    <div class="cmius-global-links">
+      <a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html" class="cmius-current">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a><a href="實驗設計與重現研究_單獨網頁.html">實驗設計與重現研究</a><a href="華語多模態反諷研究圖片詳解_pic1.html">研究圖片詳解</a><a href="華語多模態反諷辨識_AI模型研究_博士論文計畫書_HTML.html">博士論文計畫書</a><a href="全站導覽.html">全站導覽</a>
+    </div>
+  </div>
+</div>
+<!-- CMIUS global link interface: end -->
+<div class="topbar"><div class="wrap"><a class="brand" href="index.html">CMIUS 華語多模態反諷研究</a><div class="nav"><a href="index.html">總覽</a><a href="hardware.html">硬體架構</a><a href="software.html">軟體套件</a><a href="models.html">模型設計</a><a href="program.html" class="active">程式架構</a><a href="workflow.html">執行步驟</a><a href="evaluation.html">評估與論文</a></div></div></div><header class="hero"><div class="wrap"><span class="badge">博士論文研究執行架構</span><h1>程式架構與專案資料夾設計</h1><p>把資料蒐集、前處理、特徵擷取、模型訓練、評估與可解釋分析拆成可維護的研究程式專案。</p></div></header><main class="wrap">
+<section class="card"><h2>一、專案資料夾架構</h2><pre class="tree">Chinese_Multimodal_Sarcasm_Project/
+│
+├── data/
+│   ├── raw/
+│   │   ├── text/
+│   │   ├── image/
+│   │   ├── audio/
+│   │   └── video/
+│   ├── processed/
+│   │   ├── transcripts/
+│   │   ├── frames/
+│   │   ├── audio_features/
+│   │   ├── image_features/
+│   │   └── text_features/
+│   ├── annotations/
+│   │   ├── label_text.csv
+│   │   ├── label_image.csv
+│   │   ├── label_audio.csv
+│   │   ├── label_multimodal.csv
+│   │   └── label_metaphor_irony.csv
+│   └── splits/
+│       ├── train.csv
+│       ├── valid.csv
+│       └── test.csv
+│
+├── src/
+│   ├── data_collection/
+│   ├── preprocessing/
+│   ├── feature_extraction/
+│   ├── annotation/
+│   ├── models/
+│   ├── training/
+│   ├── evaluation/
+│   ├── explainability/
+│   └── utils/
+│
+├── configs/
+├── notebooks/
+├── outputs/
+├── checkpoints/
+├── logs/
+├── reports/
+└── README.md</pre></section>
+<section class="grid g2"><div class="card"><h2>二、程式模組</h2><details open><summary>data_collection/</summary><div><code>crawl_threads.py</code>, <code>crawl_dcard.py</code>, <code>crawl_ptt.py</code>, <code>crawl_weibo.py</code>, <code>download_media.py</code><br>負責蒐集文字、圖片、影片、上下文與 metadata。</div></details><details><summary>preprocessing/</summary><div><code>clean_text.py</code>, <code>normalize_chinese.py</code>, <code>extract_audio.py</code>, <code>extract_frames.py</code>, <code>build_dataset.py</code><br>負責清洗、繁簡轉換、抽幀、轉音訊、建立資料表。</div></details><details><summary>feature_extraction/</summary><div><code>extract_text_bert.py</code>, <code>extract_image_vit.py</code>, <code>extract_audio_wav2vec.py</code>, <code>extract_video_timesformer.py</code><br>負責產生 .pt / .npy embedding。</div></details><details><summary>models/</summary><div><code>text_only_model.py</code>, <code>early_fusion_model.py</code>, <code>cross_attention_model.py</code>, <code>metaphor_irony_model.py</code><br>定義所有模型架構。</div></details></div><div class="card"><h2>三、主要資料表</h2><h3>corpus.csv</h3><pre>id,source,platform,text,image_path,audio_path,video_path,context,user_id,topic,date
+0001,Threads,社群,"今天真是好天氣",images/0001.jpg,audio/0001.wav,video/0001.mp4,"前文內容",u001,生活,2026-06-10</pre><h3>annotation.csv</h3><pre>id,text_sarcasm,image_sarcasm,audio_sarcasm,multimodal_sarcasm,metaphor,irony,sarcasm,target,trigger,confidence
+0001,0,0,0,1,0,1,1,天氣,Text+Image,0.92</pre></div></section>
+<section class="card"><h2>四、訓練入口程式設計</h2><pre>python src/training/train_text.py --config configs/text_macbert.yaml
+python src/training/train_image.py --config configs/image_vit.yaml
+python src/training/train_audio.py --config configs/audio_wav2vec.yaml
+python src/training/train_multimodal.py --config configs/cmius_fusion.yaml
+python src/evaluation/ablation_study.py --checkpoint checkpoints/cmius_best.ckpt</pre></section>
+</main><div class="footer">© CMIUS｜Chinese Multimodal Irony Understanding System｜可直接作為博士計畫書附錄與研究網站使用</div></body></html>

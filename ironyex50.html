@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>華語隱喻式反諷：50句語料、理論規則與分類 Q&A</title>
+  <style>
+    :root{--navy:#17324d;--blue:#22577a;--teal:#168aad;--mint:#e7f5f3;--ink:#17212b;--muted:#5d6975;--line:#dce5eb;--paper:#fff;--bg:#f4f7f9;--gold:#f3b33d;--danger:#ad3d3d;--shadow:0 10px 28px rgba(23,50,77,.08)}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.72 system-ui,-apple-system,"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif}
+    a{color:inherit}button,select,input{font:inherit}.skip{position:absolute;left:-9999px;top:0}.skip:focus{left:12px;top:12px;z-index:99;background:#fff;padding:8px 12px;border:2px solid var(--teal)}
+    header{background:linear-gradient(130deg,#102b44,#22577a 58%,#168aad);color:#fff;padding:54px 20px 46px}.hero{max-width:1180px;margin:auto}.eyebrow{font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:#bce7ef;font-weight:800}.hero h1{font-size:clamp(2rem,4vw,3.5rem);line-height:1.16;margin:.35rem 0 1rem;max-width:900px}.hero p{max-width:850px;color:#e9f4f6;font-size:1.08rem}.formula{display:inline-block;margin-top:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);padding:10px 16px;border-radius:12px;font-weight:750}
+    nav{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}nav .inner{max-width:1180px;margin:auto;padding:9px 20px;display:flex;gap:8px;overflow:auto}nav a{white-space:nowrap;text-decoration:none;padding:7px 11px;border-radius:8px;color:var(--navy);font-size:.92rem;font-weight:700}nav a:hover,nav a:focus{background:var(--mint);outline:2px solid transparent}
+    main{max-width:1180px;margin:auto;padding:28px 20px 70px}section{scroll-margin-top:70px;margin:0 0 34px}.section-head{margin-bottom:15px}.section-head h2{font-size:1.75rem;color:var(--navy);margin:0 0 4px}.section-head p{margin:0;color:var(--muted)}
+    .grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,1fr)}.stat,.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:20px}.stat b{display:block;font-size:2rem;color:var(--blue);line-height:1.1}.stat span{color:var(--muted)}.card{padding:22px}.card h3{margin:0 0 8px;color:var(--navy)}
+    .notice{border-left:5px solid var(--teal);background:var(--mint);padding:16px 18px;border-radius:0 12px 12px 0}.notice strong{color:var(--navy)}
+    .theories{grid-template-columns:repeat(3,1fr)}.tag{display:inline-block;padding:3px 9px;border-radius:999px;background:#e8f0f7;color:var(--blue);font-size:.78rem;font-weight:800}.mini{color:var(--muted);font-size:.93rem}
+    .flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:10px;margin-top:16px}.node{background:#fff;border:2px solid #b9d4df;padding:16px;text-align:center;border-radius:13px;font-weight:750}.arrow{font-size:1.5rem;color:var(--teal);font-weight:900}
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:#fff}table{width:100%;border-collapse:collapse;min-width:820px}th,td{text-align:left;vertical-align:top;padding:11px 13px;border-bottom:1px solid var(--line)}th{position:sticky;top:0;background:#eaf2f6;color:var(--navy);font-size:.88rem;z-index:1}tbody tr:hover{background:#f7fbfc}.num{text-align:right;font-variant-numeric:tabular-nums}.pill{display:inline-block;color:#fff;font-size:.76rem;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap}.A{background:#236a8d}.B{background:#5b5aa7}.C{background:#9b5c21}.D{background:#257a64}.E{background:#9a3d62}.F{background:#5f6873}
+    .controls{display:grid;grid-template-columns:minmax(220px,1fr) 220px auto auto auto;gap:9px;margin:14px 0}.controls input,.controls select,.controls button{border:1px solid #b9c8d2;border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}.controls button{cursor:pointer;font-weight:750;color:var(--navy)}.controls button:hover,.controls button:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(22,138,173,.12);outline:none}.result-meta{color:var(--muted);margin:8px 0}
+    details{background:#fff;border:1px solid var(--line);border-radius:13px;margin:10px 0;box-shadow:0 6px 18px rgba(23,50,77,.04)}summary{cursor:pointer;padding:15px 18px;font-weight:800;color:var(--navy)}summary::marker{color:var(--teal)}details>div{padding:0 18px 18px}.qa-q{color:var(--blue);font-weight:800}.qa-a{border-left:3px solid var(--teal);padding-left:15px}.example{background:#f7fafb;border:1px dashed #aac5d1;border-radius:10px;padding:12px 14px}
+    .bars{display:grid;gap:9px}.bar{display:grid;grid-template-columns:160px 1fr 60px;gap:10px;align-items:center}.track{height:18px;background:#e9eff2;border-radius:999px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:inherit}.bar b{text-align:right}
+    code{background:#edf2f5;border-radius:5px;padding:2px 6px}footer{text-align:center;color:var(--muted);padding:24px}
+    @media(max-width:850px){.stats,.theories{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}.controls input{grid-column:1/-1}.flow{grid-template-columns:1fr}.arrow{transform:rotate(90deg);text-align:center}.bar{grid-template-columns:120px 1fr 48px}}
+    @media(max-width:540px){.stats,.theories,.controls{grid-template-columns:1fr}.hero{padding:0}.card{padding:17px}.bar{grid-template-columns:1fr 48px}.track{grid-row:2;grid-column:1/-1}}
+    @media print{nav,.controls,.no-print{display:none!important}body{background:#fff;font-size:11pt}.card,.stat,details{box-shadow:none;break-inside:avoid}details>div{display:block!important}header{padding:24px;background:#fff!important;color:#000}.hero p{color:#333}.eyebrow{color:#555}main{max-width:none;padding:15px}.table-wrap{overflow:visible}table{min-width:0}th{position:static}}
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">跳至主要內容</a>
+<header><div class="hero"><div class="eyebrow">Chinese Metaphorical Irony Corpus · Research Q&amp;A Dashboard</div><h1>華語隱喻式反諷：50句語料、理論規則與分類</h1><p>將「五十個隱喻加反諷句子」與後續分類 Q&amp;A 整合為可檢索、可展開、可列印的研究型資料頁。內容區分理論依據、操作型定義、六類機制及逐句標註。</p><div class="formula">正面隱喻期待 P⁺ ＋ 負面現實結果 R⁻ → 隱含反諷評價 I⁻</div></div></header>
+<nav aria-label="章節導覽"><div class="inner"><a href="#overview">研究總覽</a><a href="#theory">理論基礎</a><a href="#rules">六類規則</a><a href="#corpus">50句語料</a><a href="#qa">Q&amp;A</a><a href="#annotation">標註架構</a><a href="#limits">限制與研究建議</a></div></nav>
+<main id="main">
+  <section id="overview"><div class="section-head"><h2>研究總覽</h2><p>這是一份研究者建構的示例語料與操作型分類，不是自然社群平台的真實抽樣結果。</p></div>
+    <div class="grid stats"><div class="stat"><b>50</b><span>隱喻式反諷句</span></div><div class="stat"><b>6</b><span>主要不一致機制</span></div><div class="stat"><b>3</b><span>核心理論視角</span></div><div class="stat"><b>15</b><span>建議標註欄位</span></div></div>
+    <p class="notice"><strong>核心結論：</strong>這批句子的共同結構不是單純「正話反說」，而是先以隱喻啟動一組正面功能期待，再由後半句以失敗、延遲、缺席、偽善或崩解結果推翻該期待。</p>
+  </section>
+  <section id="theory"><div class="section-head"><h2>理論基礎</h2><p>三個層次共同解釋隱喻如何產生、反諷如何被推論。</p></div>
+    <div class="grid theories"><article class="card"><span class="tag">語意映射</span><h3>概念隱喻</h3><p>將來源域的結構投射到目標域，例如「燈塔」的引路功能映射到「領導者」。</p><p class="mini">判定問題：X 是否被非字面地描述為 Y？Y 的典型屬性是什麼？</p></article><article class="card"><span class="tag">語用態度</span><h3>回聲與疏離</h3><p>表面重述「他很可靠」之類的正面期待，說話者卻藉失敗結果表示不認同。</p><p class="mini">判定問題：話語是否回應、模仿或假裝接受某個期待？</p></article><article class="card"><span class="tag">衝突推論</span><h3>不一致與極性反轉</h3><p>來源域期待為正面，現實描述為負面；聽者由落差推導真正的負面評價。</p><p class="mini">判定問題：字面評價和說話者意圖是否方向相反？</p></article></div>
+    <div class="card"><h3>推論流程（本頁整理）</h3><div class="flow" role="img" aria-label="來源域映射到正面期待，接著與負面結果衝突，最後推得反諷評價"><div class="node">來源域映射<br><span class="mini">燈塔 → 領導者</span></div><div class="arrow">→</div><div class="node">正面功能期待<br><span class="mini">應該指引方向</span></div><div class="arrow">≠</div><div class="node">負面現實結果<br><span class="mini">卻帶大家迷路</span></div></div></div>
+  </section>
+  <section id="rules"><div class="section-head"><h2>六類操作規則</h2><p>依「後半句如何推翻隱喻期待」指定一個主要類別；必要時可另加次要標籤。</p></div><div class="table-wrap"><table><thead><tr><th>代碼</th><th>分類</th><th>判定規則</th><th>典型結構</th><th>主要功能</th></tr></thead><tbody>
+    <tr><td><span class="pill A">A</span></td><td>功能反轉型</td><td>未完成預期功能，反而造成相反結果</td><td>解決者＋製造更多問題</td><td>批評能力</td></tr>
+    <tr><td><span class="pill B">B</span></td><td>程度落差型</td><td>隱喻強度極高，實際表現極差</td><td>強大意象＋低劣表現</td><td>嘲笑、貶抑</td></tr>
+    <tr><td><span class="pill C">C</span></td><td>時間錯置型</td><td>宣稱快速、及時或準時，實際嚴重延遲</td><td>快速意象＋延遲結果</td><td>批評效率</td></tr>
+    <tr><td><span class="pill D">D</span></td><td>條件失效型</td><td>不需要時存在，需要時反而缺席</td><td>保護者＋危機時失效</td><td>揭露不可靠</td></tr>
+    <tr><td><span class="pill E">E</span></td><td>表裡不一型</td><td>正面道德形象與實際動機相反</td><td>正義／愛心＋自利行為</td><td>揭露偽善</td></tr>
+    <tr><td><span class="pill F">F</span></td><td>空轉崩解型</td><td>外表宏大完整，實際停滯、脆弱或不可執行</td><td>宏大系統＋停滯崩解</td><td>批評制度或計畫</td></tr>
+  </tbody></table></div></section>
+  <section id="corpus"><div class="section-head"><h2>50句逐句分類語料</h2><p>可輸入「燈塔、模型、延遲、偽善」等詞，或依六類機制篩選。</p></div>
+    <div class="controls no-print"><input id="search" type="search" placeholder="搜尋句子、意象、期待、評價…" aria-label="搜尋語料"><select id="category" aria-label="選擇分類"><option value="all">全部分類</option><option value="A">A 功能反轉型</option><option value="B">B 程度落差型</option><option value="C">C 時間錯置型</option><option value="D">D 條件失效型</option><option value="E">E 表裡不一型</option><option value="F">F 空轉崩解型</option></select><button id="clear">清除篩選</button><button id="expand">展開全部 Q&amp;A</button><button onclick="window.print()">列印／PDF</button></div>
+    <div id="resultMeta" class="result-meta" aria-live="polite"></div><div class="table-wrap"><table><thead><tr><th>#</th><th>完整句子</th><th>來源域 → 目標域</th><th>期待 ↔ 現實</th><th>分類</th><th>真正評價</th></tr></thead><tbody id="corpusBody"></tbody></table></div>
+  </section>
+  <section id="qa"><div class="section-head"><h2>研究 Q&amp;A</h2><p>將原始問答中的核心問題改寫為可展開的研究解說。</p></div>
+    <details open><summary>Q1：什麼條件下，一句話才能算是「隱喻加反諷」？</summary><div><p class="qa-a">至少同時具備：非字面的來源域映射、來源域所喚起的期待、期待與現實的明顯不一致，以及字面評價和真正意圖之間的反轉。可操作化為 <code>MI = M ∧ E ∧ C ∧ P</code>。</p></div></details>
+    <details><summary>Q2：為什麼不能只用「正話反說」分類？</summary><div><p class="qa-a">「正話反說」只指出極性反轉，沒有解釋隱喻來源域如何產生期待。例如「消防員」不只是一個正面詞，它帶有「滅火」的角色腳本；後文的「讓火更旺」正是推翻該腳本。</p></div></details>
+    <details><summary>Q3：六個類別是依照什麼原則建立的？</summary><div><p class="qa-a">依後半句推翻期待的方式分類：造成反效果、程度不相稱、時間延遲、關鍵時刻失效、道德形象與動機矛盾，或宏大事物空轉崩解。這是本資料集的操作型分類，需由標註者一致性檢驗來確認可靠度。</p></div></details>
+    <details><summary>Q4：「功能反轉」和「程度落差」如何區分？</summary><div><p class="qa-a"><strong>功能反轉</strong>有方向相反的結果，如消防員反而讓火更旺；<strong>程度落差</strong>主要是同一能力維度上的高低不符，如千里馬跑三步就故障。若兩者皆可成立，先看是否存在清楚的反向因果，再指定主要類別。</p></div></details>
+    <details><summary>Q5：「時間錯置」為什麼要獨立成類？</summary><div><p class="qa-a">及時性本身就是某些來源域的核心語意，例如閃電、離弦之箭、及時雨。延遲不是一般的低效，而是直接否定該意象的時間腳本，因此適合獨立標記。</p></div></details>
+    <details><summary>Q6：這50句可以直接當成自然語料訓練模型嗎？</summary><div><p class="qa-a">不宜直接視為自然分布語料。它們是研究者建構的示例，適合做規則驗證、提示測試及小型診斷集；正式訓練仍應加入真實社群、對話或多模態資料，並保留來源、語境及說話者關係。</p></div></details>
+    <details><summary>Q7：模型真正需要學到什麼？</summary><div><p class="qa-a">模型不能只抓「真是、萬能、厲害」等表面詞，而要重建來源域的典型功能，辨識後半句如何違反該功能，並推斷說話者的負面立場。這可以作為可解釋性分析的檢查重點。</p></div></details>
+    <details><summary>Q8：如何把文字語料延伸為多模態反諷？</summary><div><p class="qa-a">可以讓文字提供正面隱喻，圖片或影片呈現失敗現實。例如文字寫「效能猛獸」，畫面卻顯示手機當機。此時應另標示文字極性、視覺證據、跨模態不一致及哪個模態負責推翻期待。</p></div></details>
+  </section>
+  <section id="annotation"><div class="section-head"><h2>AI 語料標註架構</h2><p>建議由二元標籤升級為來源域、語境衝突與語用功能的多層標註。</p></div>
+    <div class="table-wrap"><table><thead><tr><th>欄位</th><th>內容</th><th>範例</th></tr></thead><tbody>
+      <tr><td><code>sentence_id</code></td><td>唯一語料編號</td><td>MI001</td></tr><tr><td><code>text</code></td><td>完整句子</td><td>你真是團隊裡的燈塔……</td></tr><tr><td><code>target</code></td><td>被評論對象</td><td>團隊領導者</td></tr><tr><td><code>source_domain</code></td><td>隱喻來源域</td><td>燈塔</td></tr><tr><td><code>target_domain</code></td><td>隱喻目標域</td><td>領導能力</td></tr><tr><td><code>expected_function</code></td><td>來源域的正常功能</td><td>指引方向</td></tr><tr><td><code>actual_result</code></td><td>句中實際結果</td><td>帶大家迷路</td></tr><tr><td><code>incongruity_pair</code></td><td>關鍵不一致詞組</td><td>引路／迷路</td></tr><tr><td><code>literal_polarity</code></td><td>字面評價極性</td><td>正面</td></tr><tr><td><code>intended_polarity</code></td><td>真正評價極性</td><td>負面</td></tr><tr><td><code>irony_type</code></td><td>六類主要機制</td><td>A 功能反轉型</td></tr><tr><td><code>speech_act</code></td><td>語用功能</td><td>批評</td></tr><tr><td><code>target_type</code></td><td>個人／組織／產品等</td><td>個人</td></tr><tr><td><code>explicitness</code></td><td>反諷明顯程度</td><td>顯性</td></tr><tr><td><code>metaphorical_irony</code></td><td>最終二元標籤</td><td>1</td></tr>
+    </tbody></table></div>
+  </section>
+  <section id="limits"><div class="section-head"><h2>分布、限制與下一步</h2></div><div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)"><div class="card"><h3>類別分布</h3><div class="bars" id="bars"></div></div><div class="card"><h3>研究使用注意</h3><ul><li>六類是本批示例的操作型分類，不應宣稱為普遍且唯一的語言學分類。</li><li>單句缺乏說話者、事件前文和社會關係，反諷判斷比自然對話更明顯。</li><li>正式標註應撰寫準則、訓練至少兩位標註者，並報告 Cohen’s κ 或 Krippendorff’s α。</li><li>應增加非反諷隱喻、字面負評及模糊案例作為困難負例。</li><li>多模態版本需區分模態內不一致與跨模態不一致。</li></ul></div></div></section>
+</main><footer>華語隱喻式反諷研究資料頁 · 研究者建構示例 · 2026</footer>
+<script>
+const data=[
+[1,'你真是團隊裡的燈塔，每次都把大家帶到迷路。','燈塔 → 領導者','指引方向 ↔ 帶人迷路','A','缺乏領導能力'],
+[2,'他的承諾是一張鑽石做的支票，只可惜每次都無法兌現。','鑽石支票 → 承諾','珍貴可靠 ↔ 無法兌現','B','承諾毫無信用'],
+[3,'你的時間觀念真是一座精準的時鐘，只不過永遠慢半小時。','時鐘 → 時間觀念','精準 ↔ 遲到','C','沒有時間觀念'],
+[4,'這份報告真是一座知識的金礦，挖了半天什麼也沒找到。','金礦 → 報告內容','資源豐富 ↔ 毫無收穫','B','報告內容空洞'],
+[5,'老闆的鼓勵像冬天的暖陽，照得我們每天都在加班。','暖陽 → 老闆鼓勵','帶來溫暖 ↔ 增加壓力','A','鼓勵其實是剝削'],
+[6,'你的建議是一把萬能鑰匙，成功鎖死了所有解決方案。','鑰匙 → 建議','打開問題 ↔ 鎖死方案','A','建議使問題惡化'],
+[7,'他是辦公室裡的消防員，每次出現都能讓火燒得更旺。','消防員 → 問題處理者','滅火 ↔ 助長火勢','A','越幫越忙'],
+[8,'這套系統真是一匹千里馬，跑三步就當機一次。','千里馬 → 系統','高速持久 ↔ 頻繁故障','B','系統效能很差'],
+[9,'你的簡報是一場知識盛宴，大家聽完都餓著回家。','盛宴 → 簡報內容','內容豐富 ↔ 毫無收穫','B','簡報缺乏內容'],
+[10,'他的記憶力是一座國家圖書館，只是每本書都借出去了。','圖書館 → 記憶力','資訊豐富 ↔ 什麼都記不得','B','記憶力很差'],
+[11,'這間公司的福利是一片綠洲，可惜員工永遠走不到。','綠洲 → 公司福利','提供救濟 ↔ 無法接近','D','福利只是宣傳'],
+[12,'你的道歉是一場及時雨，等到洪水退了才終於落下。','及時雨 → 道歉','及時補救 ↔ 來得太晚','C','道歉失去意義'],
+[13,'他真是我們的定海神針，一遇到事情就先躲起來。','定海神針 → 團隊支柱','穩定局勢 ↔ 逃避責任','A','缺乏擔當'],
+[14,'這堂課是一扇通往智慧的大門，可惜老師把鑰匙忘在家裡。','大門 → 課程','開啟知識 ↔ 無法進入','D','老師沒有教清楚'],
+[15,'你的效率是一支離弦之箭，射出去三天還沒離開弓。','箭 → 工作效率','迅速射出 ↔ 毫無行動','C','做事非常緩慢'],
+[16,'他的邏輯是一條筆直大道，走著走著就掉進了海裡。','大道 → 推理過程','清楚可行 ↔ 荒謬中斷','A','邏輯不通'],
+[17,'這份企畫是一艘豪華郵輪，連浴缸都還沒離開。','郵輪 → 大型企畫','航行遠方 ↔ 無法起步','F','企畫不切實際'],
+[18,'你的保密能力真是一堵銅牆鐵壁，消息五分鐘就傳遍全公司。','城牆 → 保密能力','嚴密防守 ↔ 迅速洩漏','B','完全守不住祕密'],
+[19,'他是正義的太陽，只選擇照亮對自己有利的地方。','太陽 → 公平正義','普遍照耀 ↔ 選擇性偏袒','E','假正義、真自利'],
+[20,'這家餐廳的服務是一陣春風，吹了半小時也沒把服務生吹來。','春風 → 餐廳服務','親切即時 ↔ 無人服務','D','服務緩慢'],
+[21,'你的耐心是一片汪洋，別人說兩句話就乾涸了。','汪洋 → 耐心','廣大深厚 ↔ 迅速耗盡','B','非常沒有耐性'],
+[22,'他的胸襟是一片遼闊草原，剛好只能容下一根草。','草原 → 胸襟','寬廣包容 ↔ 極度狹窄','B','心胸狹窄'],
+[23,'這次改革是一列高速列車，原地鳴笛三年還沒出發。','列車 → 改革','高速前進 ↔ 原地停留','C','改革毫無進展'],
+[24,'你真是問題的終結者，每次都能順便創造三個新問題。','終結者 → 解決者','消除問題 ↔ 製造問題','A','越處理越糟'],
+[25,'他的愛心是一座大型水庫，只在記者來的時候放水。','水庫 → 愛心','持續供給 ↔ 選擇性作秀','E','善行只是表演'],
+[26,'這個網站是一扇通往未來的窗，點一下就回到錯誤頁面。','窗 → 網站','連接未來 ↔ 功能失效','A','網站落後且難用'],
+[27,'你的分析是一把手術刀，精準地避開了所有重點。','手術刀 → 分析能力','精確切中 ↔ 完全偏離','A','分析沒有重點'],
+[28,'這部手機是一頭效能猛獸，開個相機就累得睡著了。','猛獸 → 手機效能','強大敏捷 ↔ 緩慢無力','B','手機效能不足'],
+[29,'他的話是一盞誠實的明燈，只是每句都把真相照得更模糊。','明燈 → 誠實話語','照亮真相 ↔ 掩蓋真相','A','說謊或誤導'],
+[30,'你的廚藝是一場味覺煙火，吃一口就讓人眼冒金星。','煙火 → 廚藝','驚豔享受 ↔ 痛苦不適','A','食物非常難吃'],
+[31,'這個會議是一台決策引擎，運轉三小時只產出下一次會議的日期。','引擎 → 會議','產生決策 ↔ 沒有成果','F','會議冗長無效'],
+[32,'他是大家的避風港，暴風雨一來就第一個關門。','港口 → 朋友或組織','危機時保護 ↔ 危機時拒絕','D','關鍵時刻不可靠'],
+[33,'你的計畫是一座堅固城堡，風吹一下就變成沙灘了。','城堡 → 計畫','穩固防禦 ↔ 輕易崩解','F','計畫基礎薄弱'],
+[34,'這項政策是一把保護傘，下雨時專門收起來。','雨傘 → 政策保障','需要時保護 ↔ 需要時失效','D','政策沒有保障作用'],
+[35,'他的謙虛是一層透明外套，隔著三條街都看得見他的自豪。','外套 → 謙虛表現','掩飾自滿 ↔ 炫耀明顯','E','假謙虛、真炫耀'],
+[36,'你的回覆是一道閃電，問題過了一星期才終於劈下來。','閃電 → 回覆速度','瞬間出現 ↔ 長期延遲','C','回覆速度很慢'],
+[37,'這本書是一艘思想潛水艇，還沒下水就沉了。','潛水艇 → 書籍思想','深入探索 ↔ 無法展開','F','書籍缺乏深度'],
+[38,'他的友情是一把堅固雨傘，只有晴天才願意借給你。','雨傘 → 友情支持','困難時協助 ↔ 只在順境出現','D','不能共患難'],
+[39,'這個專案是一棵茁壯大樹，每天開會澆水，就是不見它發芽。','大樹 → 專案成果','成長茁壯 ↔ 毫無進展','F','專案空轉'],
+[40,'你的解釋是一張清晰地圖，成功讓所有人走進死巷。','地圖 → 解釋','指引方向 ↔ 製造困惑','A','解釋不清楚'],
+[41,'他是公司裡的一顆螺絲釘，專門讓整台機器卡住。','螺絲釘 → 組織成員','維持運作 ↔ 阻礙運作','A','拖累團隊'],
+[42,'這個模型是一顆人工智慧大腦，連最簡單的問題都要猜三次。','大腦 → AI模型','智慧判斷 ↔ 反覆猜測','B','模型能力不足'],
+[43,'你的程式碼是一首優美交響曲，每個錯誤都演奏得格外響亮。','交響曲 → 程式碼','和諧有序 ↔ 錯誤頻繁','B','程式品質不佳'],
+[44,'這份資料集是一片遼闊海洋，只是裡面大多是重複的水。','海洋 → 資料集','規模多樣 ↔ 大量重複','B','有效資料不足'],
+[45,'他的研究是一座學術高峰，只是所有結論都建在別人的山頂上。','高峰 → 研究成就','獨立攀登 ↔ 依賴他人','E','研究缺乏原創性'],
+[46,'這篇論文是一把揭開真相的利劍，最後只割破了自己的假設。','利劍 → 論證方法','證明主張 ↔ 推翻自己','A','論證未支持假設'],
+[47,'你的實驗設計是一張細密漁網，偏偏所有變項都從洞裡逃走了。','漁網 → 實驗控制','捕捉控制 ↔ 全部漏失','F','實驗設計有漏洞'],
+[48,'這個分類器是一位明察秋毫的法官，每次都把反諷判成稱讚。','法官 → 分類器','準確判斷 ↔ 系統性誤判','A','分類器辨識失敗'],
+[49,'這套多模態模型是一對火眼金睛，看到圖片和文字後反而更糊塗。','火眼金睛 → 多模態模型','看得清楚 ↔ 融合後混亂','A','多模態融合無效'],
+[50,'這項研究是一盞照亮反諷世界的探照燈，只是目前還插錯了插座。','探照燈 → 研究系統','照亮問題 ↔ 無法啟動','F','方向有潛力但方法錯誤']];
+const names={A:'功能反轉型',B:'程度落差型',C:'時間錯置型',D:'條件失效型',E:'表裡不一型',F:'空轉崩解型'};
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function render(){const q=document.querySelector('#search').value.trim().toLowerCase(),cat=document.querySelector('#category').value;const rows=data.filter(r=>(cat==='all'||r[4]===cat)&&(!q||r.join(' ').toLowerCase().includes(q)));document.querySelector('#corpusBody').innerHTML=rows.map(r=>`<tr><td class="num">${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td>${esc(r[3])}</td><td><span class="pill ${r[4]}">${r[4]} ${names[r[4]]}</span></td><td>${esc(r[5])}</td></tr>`).join('');document.querySelector('#resultMeta').textContent=`顯示 ${rows.length}／${data.length} 句`}
+document.querySelector('#search').addEventListener('input',render);document.querySelector('#category').addEventListener('change',render);document.querySelector('#clear').addEventListener('click',()=>{document.querySelector('#search').value='';document.querySelector('#category').value='all';render()});
+let opened=false;document.querySelector('#expand').addEventListener('click',e=>{opened=!opened;document.querySelectorAll('details').forEach(d=>d.open=opened);e.currentTarget.textContent=opened?'收合全部 Q&A':'展開全部 Q&A'});
+const counts=data.reduce((a,r)=>(a[r[4]]=(a[r[4]]||0)+1,a),{});document.querySelector('#bars').innerHTML=Object.keys(names).map(k=>`<div class="bar"><span><span class="pill ${k}">${k}</span> ${names[k]}</span><div class="track"><div class="fill" style="width:${counts[k]/50*100}%"></div></div><b>${counts[k]}句</b></div>`).join('');render();
+</script></body></html>
